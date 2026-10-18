@@ -1,53 +1,49 @@
-# Projektowanie aplikacji
+# Klucz — sklep z licencjami
 
-Monorepo z frontendem Vite + React + TypeScript oraz backendem Express + TypeScript.
-Pakiety są zarządzane przez npm workspaces i wspólny `package-lock.json`.
+Prosty projekt zaliczeniowy. React + TypeScript + Tailwind, Express, Prisma i MySQL.
+Trzy przykładowe edycje programu Nova: Standard, Plus i Pro.
 
-## Wymagania
+## Uruchomienie
 
-- Node.js 24.12+ (wersja 24 LTS) i npm.
-- Docker z Docker Compose do uruchomienia kontenerów.
-
-## Praca lokalna
-
-```sh
-npm ci
-npm run dev
-```
-
-Frontend: http://localhost:5173. API: http://localhost:3000/api/health.
-Vite przekazuje żądania `/api` do backendu, więc nie trzeba konfigurować CORS.
-Backend odczytuje opcjonalną zmienną środowiskową `PORT` (domyślnie 3000).
-Plik `apps/backend/.env.example` pokazuje jej format; pliki `.env` nie są automatycznie wczytywane.
-Przy zmianie portu API należy też zmienić cel proxy w `apps/frontend/vite.config.ts`.
-
-```sh
-npm run typecheck
-npm run build
-npm run start -w @app/backend
-```
-
-## Docker
-
-Z katalogu głównego repozytorium:
+Wymagany Docker Desktop (kontenery Linux):
 
 ```sh
 docker compose up --build -d
-docker compose down
 ```
 
-Aplikacja jest dostępna pod http://localhost:8080.
-Nginx serwuje zbudowany frontend i przekazuje `/api` do backendu w sieci Compose.
-Backend działa jako użytkownik bez uprawnień root i nie publikuje portu na hoście.
-Obrazy są budowane wieloetapowo; obraz backendu zawiera tylko zależności produkcyjne.
+Sklep: http://localhost:8080. Baza, tabele i trzy produkty tworzą się automatycznie.
+Zatrzymanie: `docker compose down`. Dane pozostają w wolumenie `mysql_data`.
+Hasła w Compose są przykładowe i przeznaczone tylko do pracy lokalnej.
 
-## Struktura
+## Praca nad kodem
 
-```text
-apps/
-  frontend/  React, Vite, TypeScript, Nginx
-  backend/   Express, TypeScript
-compose.yaml
+Wymagany Node.js 24.12+ i npm. Z katalogu głównego:
+
+```sh
+docker compose stop frontend backend
+docker compose up -d db
+npm ci
 ```
 
-CI sprawdza typy, buduje aplikacje i obrazy oraz sprawdza połączenie z API przez Nginx.
+Skopiuj `apps/backend/.env.example` do `apps/backend/.env`, następnie:
+
+```sh
+npm run build
+npm run db:setup -w @app/backend
+npm run dev
+```
+
+Frontend: http://localhost:5173. Backend: http://localhost:3000/api/health.
+Sprawdzenie kodu: `npm run typecheck` i `npm run build`.
+
+## Co działa
+
+- Sklep, szczegóły produktu, koszyk i formularz zamówienia na osobnych stronach.
+- Rejestracja i logowanie, hasła haszowane przez scrypt, sesja w ciasteczku HttpOnly.
+- Produkty i zamówienia w MySQL przez Prismę. Koszyk w localStorage.
+- Zakup demonstracyjny: zapisuje zamówienie i pokazuje testowe klucze, bez pobierania pieniędzy i wysyłania e-maili.
+- Ceny i suma zamówienia liczone po stronie serwera, w groszach.
+
+Kod widoków: `apps/frontend/src/main.tsx`. API: `apps/backend/src/app.ts`.
+Schemat i przykładowe produkty: `apps/backend/prisma`.
+Projekt używa `prisma db push` zamiast historii migracji, aby konfiguracja pozostała prosta.

@@ -9,5 +9,6 @@
     "build": "npm run build --workspaces",
     "typecheck": "npm run typecheck --workspaces"
   },
-  "devDependencies": { "concurrently": "^9.2.1" }
+  "devDependencies": { "concurrently": "^9.2.1" },
+  "overrides": { "deepmerge-ts": "^8.0.0" }
 }
