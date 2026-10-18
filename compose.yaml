@@ -1,26 +1,51 @@
 services:
+  db:
+    image: mysql:8.4
+    profiles: ['database']
+    environment:
+      MYSQL_DATABASE: sklep
+      MYSQL_USER: sklep
+      MYSQL_PASSWORD: sklep_demo
+      MYSQL_ROOT_PASSWORD: root_demo
+    ports:
+      - '127.0.0.1:3306:3306'
+    volumes:
+      - mysql_data:/var/lib/mysql
+    healthcheck:
+      test: ['CMD', 'mysqladmin', 'ping', '-h', '127.0.0.1']
+      interval: 5s
+      timeout: 5s
+      retries: 30
   backend:
     build:
       context: .
       dockerfile: apps/backend/Dockerfile
     environment:
-      NODE_ENV: production
       PORT: 3000
+    ports:
+      - '127.0.0.1:3000:3000'
     init: true
-    restart: unless-stopped
     healthcheck:
-      test: ["CMD", "node", "-e", "fetch('http://127.0.0.1:3000/api/health').then(r => process.exit(r.ok ? 0 : 1)).catch(() => process.exit(1))"]
-      interval: 10s
+      test:
+        [
+          'CMD',
+          'node',
+          '-e',
+          "fetch('http://127.0.0.1:3000').then(() => process.exit(0)).catch(() => process.exit(1))",
+        ]
+      interval: 5s
       timeout: 3s
-      retries: 5
-      start_period: 10s
+      retries: 20
+      start_period: 30s
   frontend:
     build:
       context: .
       dockerfile: apps/frontend/Dockerfile
     ports:
-      - "8080:80"
+      - '127.0.0.1:8080:80'
     depends_on:
       backend:
         condition: service_healthy
-    restart: unless-stopped
+
+volumes:
+  mysql_data:

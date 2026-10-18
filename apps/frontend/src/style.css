@@ -1,13 +1,1 @@
-:root {
-  font-family: system-ui, sans-serif;
-  color: #18243b;
-  background: #f4f6fa;
-  font-synthesis: none;
-  text-rendering: optimizeLegibility;
-}
-body { margin: 0; min-width: 320px; }
-main { max-width: 760px; margin: 15vh auto; padding: 32px; }
-h1 { font-size: clamp(2rem, 6vw, 3.5rem); letter-spacing: -0.04em; }
-p { line-height: 1.6; }
-.eyebrow { color: #506182; font-size: 0.85rem; }
-[role='status'] { padding: 16px 20px; border: 1px solid #d7deeb; border-radius: 12px; background: white; }
+@import 'tailwindcss';
