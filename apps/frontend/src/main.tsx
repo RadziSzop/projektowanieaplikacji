@@ -49,8 +49,8 @@ function App() {
   const count = cart.reduce((sum, p) => sum + p.quantity, 0);
   const summary = <div className="panel summary"><p className="eyebrow">TWOJE ZAMÓWIENIE</p><h2>Podsumowanie</h2>{entries.map(p => <div className="flex justify-between gap-4 text-sm" key={p.id}><span className="muted">Nova {p.name} × {p.quantity}</span><span>{money(p.price * p.quantity)}</span></div>)}<div className="flex justify-between text-sm"><span className="muted">Dostawa cyfrowa</span><span className="text-lime-300">Bezpłatnie</span></div><div className="total"><span>Razem</span><strong>{money(total)}</strong></div><p className="muted text-xs">Cena zawiera VAT. Jednorazowy zakup.</p></div>;
   return <div className="min-h-screen flex flex-col">
-    <header><div className="container flex items-center justify-between gap-4"><Link className="brand" to="/"><span className="brand-symbol"><KeyIcon small /></span>klucz<span className="text-lime-300">.</span></Link><nav className="flex items-center gap-5 sm:gap-8"><NavLink to="/" end>Sklep</NavLink><NavLink to="/koszyk">Koszyk <span className="counter">{count}</span></NavLink>{user ? <button onClick={async () => { try { await api('logout', {}); setUser(null); setNotice('Wylogowano.'); } catch (e) { setNotice((e as Error).message); } }}>Wyloguj <span className="hidden sm:inline">({user.name})</span></button> : <NavLink className="login-link" to="/logowanie">Zaloguj się <span aria-hidden="true">↗</span></NavLink>}</nav></div></header>
-    <main className="container flex-1">
+    <header><div className="shell flex items-center justify-between gap-4"><Link className="brand" to="/"><span className="brand-symbol"><KeyIcon small /></span>klucz<span className="text-lime-300">.</span></Link><nav className="flex items-center gap-5 sm:gap-8"><NavLink to="/" end>Sklep</NavLink><NavLink to="/koszyk">Koszyk <span className="counter">{count}</span></NavLink>{user ? <button onClick={async () => { try { await api('logout', {}); setUser(null); setNotice('Wylogowano.'); } catch (e) { setNotice((e as Error).message); } }}>Wyloguj <span className="hidden sm:inline">({user.name})</span></button> : <NavLink className="login-link" to="/logowanie">Zaloguj się <span aria-hidden="true">↗</span></NavLink>}</nav></div></header>
+    <main className="shell flex-1">
       {notice && <div className="toast" role="status">✓ {notice}</div>}
       {loadError && <p className="error" role="alert">{loadError} Odśwież stronę, aby spróbować ponownie.</p>}
       <Routes>
@@ -68,7 +68,7 @@ function App() {
         <Route path="*" element={<section className="page"><h1>Nie ma takiej strony.</h1><Link className="back-link" to="/">Wróć do sklepu →</Link></section>} />
       </Routes>
     </main>
-    <footer><div className="container flex flex-wrap justify-between gap-4"><span className="font-semibold text-white">klucz<span className="text-lime-300">.</span> <span className="muted font-normal ml-3 text-xs">Mały klucz. Wielkie możliwości.</span></span><span className="text-xs muted">© {new Date().getFullYear()} Klucz · Sklep demonstracyjny</span></div></footer>
+    <footer><div className="shell flex flex-wrap justify-between gap-4"><span className="font-semibold text-white">klucz<span className="text-lime-300">.</span> <span className="muted font-normal ml-3 text-xs">Mały klucz. Wielkie możliwości.</span></span><span className="text-xs muted">© {new Date().getFullYear()} Klucz · Sklep demonstracyjny</span></div></footer>
   </div>;
 }
 function Breadcrumb({ current }: { current: string }) { return <div className="breadcrumb"><Link to="/">Sklep</Link><span>/</span><span>{current}</span></div>; }

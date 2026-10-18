@@ -16,10 +16,10 @@
   input::placeholder { color: #717774; }
 }
 @layer components {
-  .container { width: min(1152px, calc(100% - 64px)); margin-inline: auto; }
+  .shell { width: min(1152px, calc(100% - 64px)); margin-inline: auto; }
   .muted { color: #999e9b; }
   header { border-bottom: 1px solid #292c2a; }
-  header .container { min-height: 88px; }
+  header .shell { min-height: 88px; }
   .brand { display: flex; align-items: center; font-size: 27px; letter-spacing: -1px; font-weight: 700; }
   .brand-symbol { display: grid; place-items: center; background: #cbf277; color: #17200e; width: 34px; height: 34px; border-radius: 9px; margin-right: 11px; }
   nav { font-size: 13px; color: #a6aaa6; }
@@ -105,7 +105,7 @@
   .demo-note { background: #242b1e; border: 1px solid #3f4e30; border-radius: 8px; padding: 16px; font-size: 12px; line-height: 1.7; color: #b5c4a5; }
   .demo-note strong { color: #daebc6; display: block; margin-bottom: 5px; }
   @media (max-width: 800px) {
-    .container { width: calc(100% - 36px); }
+    .shell { width: calc(100% - 36px); }
     header nav { gap: 12px; font-size: 12px; }
     .brand { font-size: 24px; }
     .hero { grid-template-columns: 1fr; padding-block: 44px; }
