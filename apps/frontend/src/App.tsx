@@ -1,121 +1,33 @@
-import { useEffect, useState } from 'react';
-import { Link, NavLink, Navigate, Route, Routes, useLocation } from 'react-router-dom';
-import { api, readCart, type CartItem, type Order, type Product, type User } from './api';
-import { link } from './components';
+import { Link, Navigate, Route, Routes } from 'react-router-dom';
+import { link } from './components/ui';
+import Navbar from './components/Navbar';
+import { useShop } from './useShop';
 import { Shop, Details } from './pages/Shop';
 import Cart from './pages/Cart';
 import { Checkout, Confirmation } from './pages/Checkout';
 import Auth from './pages/Auth';
 
 export default function App() {
-  const { pathname } = useLocation();
-  const [products, setProducts] = useState<Product[]>([]);
-  const [loaded, setLoaded] = useState(false);
-  const [user, setUser] = useState<User | null>(null);
-  const [cart, setCart] = useState<CartItem[]>(readCart);
-  const [order, setOrder] = useState<Order | null>(null);
-  const [message, setMessage] = useState('');
-  const [error, setError] = useState('');
-
-  useEffect(() => {
-    Promise.all([api<Product[]>('products'), api<User | null>('me')])
-      .then(([products, user]) => {
-        setProducts(products);
-        setUser(user);
-      })
-      .catch((e) => setError(e.message))
-      .finally(() => setLoaded(true));
-  }, []);
-  useEffect(() => {
-    localStorage.setItem('koszyk', JSON.stringify(cart));
-  }, [cart]);
-  useEffect(() => {
-    window.scrollTo(0, 0);
-    setMessage('');
-  }, [pathname]);
-
-  function add(product: Product) {
-    const current = cart.find((item) => item.id === product.id);
-    if (current && current.quantity >= 10) {
-      setMessage('Maksymalnie 10 sztuk produktu.');
-      return;
-    }
-    setCart(
-      current
-        ? cart.map((item) =>
-            item.id === product.id ? { ...item, quantity: item.quantity + 1 } : item,
-          )
-        : [...cart, { id: product.id, quantity: 1 }],
-    );
-    setMessage(`Dodano Nova ${product.name} do koszyka.`);
-  }
-  function changeQuantity(id: number, quantity: number) {
-    setCart(cart.map((item) => (item.id === id ? { ...item, quantity } : item)));
-  }
-  async function logout() {
-    try {
-      await api('logout', {});
-      setUser(null);
-    } catch (e) {
-      setError((e as Error).message);
-    }
-  }
-  const items = cart.flatMap((item) => {
-    const product = products.find((p) => p.id === item.id);
-    return product ? [{ ...product, quantity: item.quantity }] : [];
-  });
-  const count = cart.reduce((sum, item) => sum + item.quantity, 0);
+  const {
+    products,
+    loaded,
+    user,
+    setUser,
+    order,
+    message,
+    error,
+    items,
+    count,
+    add,
+    changeQuantity,
+    remove,
+    completeOrder,
+    logout,
+  } = useShop();
 
   return (
     <>
-      <header className="border-b border-zinc-800">
-        <div className="mx-auto flex max-w-5xl flex-wrap items-center justify-between gap-4 px-6 py-5">
-          <Link to="/" className="text-lg font-semibold tracking-tight">
-            Sklep z kluczami
-          </Link>
-          <nav className="flex flex-wrap items-center gap-2 text-sm">
-            <NavLink
-              to="/koszyk"
-              aria-label={`Koszyk (${count})`}
-              className={({ isActive }) =>
-                `inline-flex items-center gap-2 rounded-md px-3 py-2 ${isActive ? 'bg-zinc-800 text-white' : 'text-zinc-400 hover:text-white'}`
-              }
-            >
-              <svg
-                width="22"
-                height="22"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="1.75"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                aria-hidden="true"
-              >
-                <path d="M3 3h2l2.5 12h11L21 7H6" />
-                <circle cx="9" cy="20" r="1" />
-                <circle cx="18" cy="20" r="1" />
-              </svg>
-              <span className="text-xs">{count}</span>
-            </NavLink>
-            {user ? (
-              <button
-                className="cursor-pointer px-3 py-2 text-zinc-400 hover:text-white"
-                onClick={logout}
-              >
-                Wyloguj ({user.name})
-              </button>
-            ) : (
-              <Link
-                className="rounded-md border border-zinc-700 px-3 py-2 hover:bg-zinc-800"
-                to="/logowanie"
-              >
-                Zaloguj się
-              </Link>
-            )}
-          </nav>
-        </div>
-      </header>
+      <Navbar count={count} user={user} onLogout={logout} />
       <main className="mx-auto max-w-5xl px-6 py-10 sm:py-12">
         {message && (
           <p
@@ -142,12 +54,7 @@ export default function App() {
             <Route
               path="/koszyk"
               element={
-                <Cart
-                  items={items}
-                  user={user}
-                  changeQuantity={changeQuantity}
-                  remove={(id) => setCart(cart.filter((item) => item.id !== id))}
-                />
+                <Cart items={items} user={user} changeQuantity={changeQuantity} remove={remove} />
               }
             />
             <Route
@@ -156,14 +63,7 @@ export default function App() {
                 !user ? (
                   <Navigate to="/logowanie" state={{ from: '/zamowienie' }} replace />
                 ) : (
-                  <Checkout
-                    items={items}
-                    user={user}
-                    onOrder={(result) => {
-                      setOrder(result);
-                      setCart([]);
-                    }}
-                  />
+                  <Checkout items={items} user={user} onOrder={completeOrder} />
                 )
               }
             />

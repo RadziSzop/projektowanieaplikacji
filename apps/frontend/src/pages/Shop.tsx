@@ -1,6 +1,6 @@
 import { Link, useParams } from 'react-router-dom';
 import { money, type Product } from '../api';
-import { button, link, panel } from '../components';
+import { button, link, panel } from '../components/ui';
 
 type Props = { products: Product[]; add: (product: Product) => void };
 

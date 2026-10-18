@@ -27,7 +27,8 @@ npm run build
 npm run format
 ```
 
-Widoki: `apps/frontend/src/pages`. Stan i nawigacja: `apps/frontend/src/App.tsx`.
+Widoki: `apps/frontend/src/pages`. Wspólne komponenty i navbar: `apps/frontend/src/components`.
+Nawigacja: `apps/frontend/src/App.tsx`. Stan i wywołania API: `apps/frontend/src/useShop.ts`.
 Style są w klasach Tailwinda. Express: `apps/backend/src/index.ts`.
 
 MySQL jest odłączony od aplikacji. Można uruchomić go osobno przez `docker compose --profile database up -d db`. Istniejące dane pozostają w wolumenie.

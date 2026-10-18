@@ -1,7 +1,7 @@
 import { useState, type FormEvent } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { api, type User } from '../api';
-import { button, Field, link, panel } from '../components';
+import { button, Field, link, panel } from '../components/ui';
 
 export default function Auth({
   register,

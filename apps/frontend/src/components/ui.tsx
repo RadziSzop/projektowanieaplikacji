@@ -1,5 +1,5 @@
 import type { InputHTMLAttributes } from 'react';
-import { money, type CartProduct } from './api';
+import { money, type CartProduct } from '../api';
 
 export const button =
   'inline-flex cursor-pointer items-center justify-center rounded-md bg-indigo-500 px-4 py-2.5 text-sm font-medium text-white hover:bg-indigo-400 disabled:cursor-default disabled:opacity-50 focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-indigo-400';

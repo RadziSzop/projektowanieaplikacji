@@ -1,6 +1,6 @@
 import { Link } from 'react-router-dom';
 import { money, type CartProduct, type User } from '../api';
-import { button, link, panel, Summary } from '../components';
+import { button, link, panel, Summary } from '../components/ui';
 
 type Props = {
   items: CartProduct[];

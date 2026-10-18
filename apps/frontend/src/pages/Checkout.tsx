@@ -1,7 +1,7 @@
 import { useState, type FormEvent } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { api, money, type CartProduct, type Order, type User } from '../api';
-import { button, Field, link, panel, Summary } from '../components';
+import { button, Field, link, panel, Summary } from '../components/ui';
 
 export function Checkout({
   items,
