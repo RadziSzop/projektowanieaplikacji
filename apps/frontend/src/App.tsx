@@ -75,21 +75,28 @@ export default function App() {
           </Link>
           <nav className="flex flex-wrap items-center gap-2 text-sm">
             <NavLink
-              to="/"
-              end
-              className={({ isActive }) =>
-                `rounded-md px-3 py-2 ${isActive ? 'bg-zinc-800 text-white' : 'text-zinc-400 hover:text-white'}`
-              }
-            >
-              Sklep
-            </NavLink>
-            <NavLink
               to="/koszyk"
+              aria-label={`Koszyk (${count})`}
               className={({ isActive }) =>
-                `rounded-md px-3 py-2 ${isActive ? 'bg-zinc-800 text-white' : 'text-zinc-400 hover:text-white'}`
+                `inline-flex items-center gap-2 rounded-md px-3 py-2 ${isActive ? 'bg-zinc-800 text-white' : 'text-zinc-400 hover:text-white'}`
               }
             >
-              Koszyk ({count})
+              <svg
+                width="22"
+                height="22"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="1.75"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                aria-hidden="true"
+              >
+                <path d="M3 3h2l2.5 12h11L21 7H6" />
+                <circle cx="9" cy="20" r="1" />
+                <circle cx="18" cy="20" r="1" />
+              </svg>
+              <span className="text-xs">{count}</span>
             </NavLink>
             {user ? (
               <button
