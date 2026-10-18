@@ -1,7 +1,7 @@
 # Klucz — sklep z licencjami
 
 Prosty projekt zaliczeniowy. React + TypeScript + Tailwind, Express, Prisma i MySQL.
-Trzy przykładowe edycje programu Nova: Standard, Plus i Pro.
+Trzy edycje programu Nova: Standard, Plus i Pro.
 
 ## Uruchomienie
 
@@ -41,9 +41,12 @@ Sprawdzenie kodu: `npm run typecheck` i `npm run build`.
 - Sklep, szczegóły produktu, koszyk i formularz zamówienia na osobnych stronach.
 - Rejestracja i logowanie, hasła haszowane przez scrypt, sesja w ciasteczku HttpOnly.
 - Produkty i zamówienia w MySQL przez Prismę. Koszyk w localStorage.
-- Zakup demonstracyjny: zapisuje zamówienie i pokazuje testowe klucze, bez pobierania pieniędzy i wysyłania e-maili.
+- Formularz zamówienia jest dostępny na froncie po zalogowaniu. Wysyła dane do API i wyświetla klucze z odpowiedzi.
 - Ceny i suma zamówienia liczone po stronie serwera, w groszach.
 
-Kod widoków: `apps/frontend/src/main.tsx`. API: `apps/backend/src/app.ts`.
-Schemat i przykładowe produkty: `apps/backend/prisma`.
+Widoki: `apps/frontend/src/pages`. Nawigacja i stan aplikacji: `apps/frontend/src/App.tsx`.
+Wspólne pola formularzy i podsumowanie: `apps/frontend/src/components.tsx`.
+Style są zapisane w klasach Tailwinda; `style.css` zawiera tylko import biblioteki.
+Frontend korzysta z wywołań `/api/products`, `/api/me`, `/api/login`, `/api/register`, `/api/logout` i `/api/orders`, bez mocków i danych zastępczych. Błędy API są wyświetlane w interfejsie.
+API: `apps/backend/src/app.ts`. Schemat i produkty: `apps/backend/prisma`.
 Projekt używa `prisma db push` zamiast historii migracji, aby konfiguracja pozostała prosta.
