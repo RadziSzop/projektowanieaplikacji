@@ -35,6 +35,7 @@ npm run dev
 
 Frontend: http://localhost:5173. Backend: http://localhost:3000/api/health.
 Sprawdzenie kodu: `npm run typecheck` i `npm run build`.
+Formatowanie plików Prettierem: `npm run format`.
 
 ## Co działa
 

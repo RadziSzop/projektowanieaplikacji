@@ -2,13 +2,23 @@
   "name": "projektowanieaplikacji",
   "version": "0.1.0",
   "private": true,
-  "workspaces": ["apps/*"],
-  "engines": { "node": ">=24.12.0 <25" },
+  "workspaces": [
+    "apps/*"
+  ],
+  "engines": {
+    "node": ">=24.12.0 <25"
+  },
   "scripts": {
     "dev": "concurrently -k -n frontend,backend \"npm run dev -w @app/frontend\" \"npm run dev -w @app/backend\"",
     "build": "npm run build --workspaces",
-    "typecheck": "npm run typecheck --workspaces"
+    "typecheck": "npm run typecheck --workspaces",
+    "format": "prettier --write ."
   },
-  "devDependencies": { "concurrently": "^9.2.1" },
-  "overrides": { "deepmerge-ts": "^8.0.0" }
+  "devDependencies": {
+    "concurrently": "^9.2.1",
+    "prettier": "^3.9.10"
+  },
+  "overrides": {
+    "deepmerge-ts": "^8.0.0"
+  }
 }
