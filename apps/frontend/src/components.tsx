@@ -2,7 +2,7 @@ import type { InputHTMLAttributes } from 'react';
 import { money, type CartProduct } from './api';
 
 export const button =
-  'inline-flex cursor-pointer items-center justify-center rounded-md bg-zinc-100 px-4 py-2.5 text-sm font-medium text-zinc-900 hover:bg-white disabled:cursor-default disabled:opacity-50 focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-zinc-400';
+  'inline-flex cursor-pointer items-center justify-center rounded-md bg-indigo-500 px-4 py-2.5 text-sm font-medium text-white hover:bg-indigo-400 disabled:cursor-default disabled:opacity-50 focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-indigo-400';
 export const link = 'text-sm text-zinc-400 underline-offset-4 hover:text-white hover:underline';
 export const panel = 'rounded-lg border border-zinc-700/70 bg-zinc-800/40 p-6';
 
@@ -15,7 +15,7 @@ export function Field({
       {label}
       <input
         {...props}
-        className="mt-2 block w-full rounded-md border border-zinc-700 bg-zinc-900 px-3 py-2.5 text-zinc-100 outline-none focus:border-zinc-400"
+        className="mt-2 block w-full rounded-md border border-zinc-700 bg-zinc-900 px-3 py-2.5 text-zinc-100 outline-none focus:border-indigo-400"
       />
     </label>
   );

@@ -7,7 +7,13 @@ type Props = { products: Product[]; add: (product: Product) => void };
 export function Shop({ products, add }: Props) {
   return (
     <>
-      <h1 className="mb-8 text-3xl font-semibold tracking-tight">Licencje Nova</h1>
+      <div className="mb-8 border-b border-zinc-800 pb-6">
+        <h1 className="text-3xl font-semibold tracking-tight">Licencje Nova</h1>
+        <p className="mt-2 text-sm text-zinc-400">Standard, Plus i Pro</p>
+      </div>
+      {!products.length && (
+        <p className={panel + ' text-sm text-zinc-400'}>Brak produktów do wyświetlenia.</p>
+      )}
       <div className="grid gap-5 sm:grid-cols-3">
         {products.map((product) => (
           <article className={panel + ' flex flex-col'} key={product.id}>

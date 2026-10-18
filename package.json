@@ -17,8 +17,5 @@
   "devDependencies": {
     "concurrently": "^9.2.1",
     "prettier": "^3.9.10"
-  },
-  "overrides": {
-    "deepmerge-ts": "^8.0.0"
   }
 }

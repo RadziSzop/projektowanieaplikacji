@@ -1,53 +1,33 @@
-# Klucz — sklep z licencjami
+# Sklep z kluczami
 
-Prosty projekt zaliczeniowy. React + TypeScript + Tailwind, Express, Prisma i MySQL.
-Trzy edycje programu Nova: Standard, Plus i Pro.
+Frontend: React, TypeScript i Tailwind. Backend: pusty Express, bez endpointów i obsługi bazy.
 
 ## Uruchomienie
-
-Wymagany Docker Desktop (kontenery Linux):
 
 ```sh
 docker compose up --build -d
 ```
 
-Sklep: http://localhost:8080. Baza, tabele i trzy produkty tworzą się automatycznie.
-Zatrzymanie: `docker compose down`. Dane pozostają w wolumenie `mysql_data`.
-Hasła w Compose są przykładowe i przeznaczone tylko do pracy lokalnej.
+Aplikacja: http://localhost:8080. Express działa na porcie 3000.
+Wywołania `/api/products`, `/api/me`, `/api/register`, `/api/login`, `/api/logout` i `/api/orders` zwracają 404. Frontend wyświetla błędy API i nie zawiera mocków.
 
 ## Praca nad kodem
 
-Wymagany Node.js 24.12+ i npm. Z katalogu głównego:
+Node.js 24.12+ i npm:
 
 ```sh
-docker compose stop frontend backend
-docker compose up -d db
 npm ci
-```
-
-Skopiuj `apps/backend/.env.example` do `apps/backend/.env`, następnie:
-
-```sh
-npm run build
-npm run db:setup -w @app/backend
 npm run dev
 ```
 
-Frontend: http://localhost:5173. Backend: http://localhost:3000/api/health.
-Sprawdzenie kodu: `npm run typecheck` i `npm run build`.
-Formatowanie plików Prettierem: `npm run format`.
+Frontend: http://localhost:5173. Backend: http://localhost:3000.
 
-## Co działa
+```sh
+npm run build
+npm run format
+```
 
-- Sklep, szczegóły produktu, koszyk i formularz zamówienia na osobnych stronach.
-- Rejestracja i logowanie, hasła haszowane przez scrypt, sesja w ciasteczku HttpOnly.
-- Produkty i zamówienia w MySQL przez Prismę. Koszyk w localStorage.
-- Formularz zamówienia jest dostępny na froncie po zalogowaniu. Wysyła dane do API i wyświetla klucze z odpowiedzi.
-- Ceny i suma zamówienia liczone po stronie serwera, w groszach.
+Widoki: `apps/frontend/src/pages`. Stan i nawigacja: `apps/frontend/src/App.tsx`.
+Style są w klasach Tailwinda. Express: `apps/backend/src/index.ts`.
 
-Widoki: `apps/frontend/src/pages`. Nawigacja i stan aplikacji: `apps/frontend/src/App.tsx`.
-Wspólne pola formularzy i podsumowanie: `apps/frontend/src/components.tsx`.
-Style są zapisane w klasach Tailwinda; `style.css` zawiera tylko import biblioteki.
-Frontend korzysta z wywołań `/api/products`, `/api/me`, `/api/login`, `/api/register`, `/api/logout` i `/api/orders`, bez mocków i danych zastępczych. Błędy API są wyświetlane w interfejsie.
-API: `apps/backend/src/app.ts`. Schemat i produkty: `apps/backend/prisma`.
-Projekt używa `prisma db push` zamiast historii migracji, aby konfiguracja pozostała prosta.
+MySQL jest odłączony od aplikacji. Można uruchomić go osobno przez `docker compose --profile database up -d db`. Istniejące dane pozostają w wolumenie.

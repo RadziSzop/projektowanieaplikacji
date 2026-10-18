@@ -1,6 +1,7 @@
 services:
   db:
     image: mysql:8.4
+    profiles: ['database']
     environment:
       MYSQL_DATABASE: sklep
       MYSQL_USER: sklep
@@ -21,12 +22,8 @@ services:
       dockerfile: apps/backend/Dockerfile
     environment:
       PORT: 3000
-      DATABASE_URL: mysql://sklep:sklep_demo@db:3306/sklep
     ports:
       - '127.0.0.1:3000:3000'
-    depends_on:
-      db:
-        condition: service_healthy
     init: true
     healthcheck:
       test:
@@ -34,7 +31,7 @@ services:
           'CMD',
           'node',
           '-e',
-          "fetch('http://127.0.0.1:3000/api/health').then(r => process.exit(r.ok ? 0 : 1)).catch(() => process.exit(1))",
+          "fetch('http://127.0.0.1:3000').then(() => process.exit(0)).catch(() => process.exit(1))",
         ]
       interval: 5s
       timeout: 3s

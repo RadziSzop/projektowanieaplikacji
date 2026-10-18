@@ -38,10 +38,13 @@ export default function Auth({
     }
   }
   return (
-    <div className="mx-auto max-w-sm">
-      <h1 className="mb-8 text-3xl font-semibold tracking-tight">
+    <div className="mx-auto max-w-md">
+      <h1 className="mb-2 text-3xl font-semibold tracking-tight">
         {register ? 'Rejestracja' : 'Logowanie'}
       </h1>
+      <p className="mb-7 text-sm text-zinc-400">
+        {register ? 'Podaj dane do utworzenia konta.' : 'Wprowadź dane swojego konta.'}
+      </p>
       {from === '/zamowienie' && (
         <p className="mb-4 text-sm text-zinc-400">Zaloguj się, aby złożyć zamówienie.</p>
       )}

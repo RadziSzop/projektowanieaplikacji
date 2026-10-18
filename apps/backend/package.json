@@ -5,15 +5,12 @@
   "type": "module",
   "scripts": {
     "dev": "tsx watch src/index.ts",
-    "build": "prisma generate && tsc",
-    "typecheck": "prisma generate && tsc --noEmit",
-    "db:setup": "prisma db push --skip-generate && node prisma/seed.js",
-    "start": "npm run db:setup && node dist/index.js"
+    "build": "tsc",
+    "typecheck": "tsc --noEmit",
+    "start": "node dist/index.js"
   },
   "dependencies": {
-    "@prisma/client": "^6.19.3",
-    "express": "^5.1.0",
-    "prisma": "^6.19.3"
+    "express": "^5.1.0"
   },
   "devDependencies": {
     "@types/express": "^5.0.0",
