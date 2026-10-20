@@ -1,26 +1,167 @@
+name: license-platform
+x-app-env: &app-env
+  NODE_ENV: production
+  DATABASE_URL: postgresql://licensing:${POSTGRES_PASSWORD:?Set POSTGRES_PASSWORD}@postgres:5432/licensing
+  RABBITMQ_URL: amqp://licensing:${RABBITMQ_PASSWORD:?Set RABBITMQ_PASSWORD}@rabbitmq:5672
+  KEY_ENCRYPTION_KEY: ${KEY_ENCRYPTION_KEY:?Set a base64 encoded 32-byte key}
+  PUBLIC_ORIGIN: ${PUBLIC_ORIGIN:-http://localhost:8080}
+  LICENSE_SERVICE_URL: http://license-service:3001
 services:
+  postgres:
+    image: postgres:17-alpine
+    environment:
+      POSTGRES_USER: licensing
+      POSTGRES_DB: licensing
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?Set POSTGRES_PASSWORD}
+    ports: ['127.0.0.1:5432:5432']
+    volumes: [postgres_data:/var/lib/postgresql/data]
+    healthcheck:
+      test: ['CMD-SHELL', 'pg_isready -U licensing -d licensing']
+      interval: 3s
+      timeout: 3s
+      retries: 30
+  rabbitmq:
+    image: rabbitmq:4-management-alpine
+    environment:
+      RABBITMQ_DEFAULT_USER: licensing
+      RABBITMQ_DEFAULT_PASS: ${RABBITMQ_PASSWORD:?Set RABBITMQ_PASSWORD}
+    ports: ['127.0.0.1:5672:5672', '127.0.0.1:15672:15672']
+    volumes: [rabbitmq_data:/var/lib/rabbitmq]
+    healthcheck:
+      test: ['CMD', 'rabbitmq-diagnostics', '-q', 'ping']
+      interval: 5s
+      timeout: 5s
+      retries: 30
+  mailpit:
+    image: axllent/mailpit:v1.27
+    environment:
+      MP_DATABASE: /data/mailpit.db
+    ports: ['127.0.0.1:8025:8025', '127.0.0.1:1025:1025']
+    volumes: [mailpit_data:/data]
+    healthcheck:
+      test: ['CMD', '/mailpit', 'readyz']
+      interval: 5s
+      timeout: 3s
+      retries: 20
+  influxdb:
+    image: influxdb:2.9-alpine
+    environment:
+      DOCKER_INFLUXDB_INIT_MODE: setup
+      DOCKER_INFLUXDB_INIT_USERNAME: licensing
+      DOCKER_INFLUXDB_INIT_PASSWORD: ${INFLUXDB_PASSWORD:?Set INFLUXDB_PASSWORD}
+      DOCKER_INFLUXDB_INIT_ORG: licensing
+      DOCKER_INFLUXDB_INIT_BUCKET: events
+      DOCKER_INFLUXDB_INIT_RETENTION: 30d
+      DOCKER_INFLUXDB_INIT_ADMIN_TOKEN: ${INFLUXDB_TOKEN:?Set INFLUXDB_TOKEN}
+    ports: ['127.0.0.1:8086:8086']
+    volumes: [influxdb_data:/var/lib/influxdb2, influxdb_config:/etc/influxdb2]
+    healthcheck:
+      test: ['CMD', 'influx', 'ping']
+      interval: 5s
+      timeout: 3s
+      retries: 30
+  migrate:
+    build:
+      context: .
+      dockerfile: apps/backend/Dockerfile
+      target: build
+    environment:
+      <<: *app-env
+      ADMIN_EMAIL: ${ADMIN_EMAIL:?Set ADMIN_EMAIL}
+      ADMIN_PASSWORD: ${ADMIN_PASSWORD:?Set ADMIN_PASSWORD}
+    command: ['sh', '-c', 'npm run db:deploy && npm run db:seed']
+    depends_on:
+      postgres: { condition: service_healthy }
   backend:
     build:
       context: .
       dockerfile: apps/backend/Dockerfile
     environment:
-      NODE_ENV: production
+      <<: *app-env
       PORT: 3000
+    ports: ['127.0.0.1:3000:3000']
     init: true
     restart: unless-stopped
+    depends_on:
+      migrate: { condition: service_completed_successfully }
     healthcheck:
-      test: ["CMD", "node", "-e", "fetch('http://127.0.0.1:3000/api/health').then(r => process.exit(r.ok ? 0 : 1)).catch(() => process.exit(1))"]
-      interval: 10s
+      test:
+        [
+          'CMD',
+          'node',
+          '-e',
+          "fetch('http://127.0.0.1:3000/api/ready').then(r=>process.exit(r.ok?0:1)).catch(()=>process.exit(1))",
+        ]
+      interval: 5s
       timeout: 3s
-      retries: 5
-      start_period: 10s
+      retries: 30
+  license-service:
+    build:
+      context: .
+      dockerfile: apps/license-service/Dockerfile
+    environment:
+      <<: *app-env
+      PORT: 3001
+    init: true
+    restart: unless-stopped
+    depends_on:
+      migrate: { condition: service_completed_successfully }
+    healthcheck:
+      test:
+        [
+          'CMD',
+          'node',
+          '-e',
+          "fetch('http://127.0.0.1:3001/health').then(r=>process.exit(r.ok?0:1)).catch(()=>process.exit(1))",
+        ]
+      interval: 5s
+      timeout: 3s
+      retries: 30
+  notification-worker:
+    build:
+      context: .
+      dockerfile: apps/notification-worker/Dockerfile
+    environment:
+      <<: *app-env
+      PORT: 3002
+      SMTP_HOST: mailpit
+      SMTP_PORT: 1025
+      SMTP_FROM: licenses@nova.local
+      INFLUXDB_URL: http://influxdb:8086
+      INFLUXDB_TOKEN: ${INFLUXDB_TOKEN:?Set INFLUXDB_TOKEN}
+      INFLUXDB_ORG: licensing
+      INFLUXDB_BUCKET: events
+    init: true
+    restart: unless-stopped
+    depends_on:
+      migrate: { condition: service_completed_successfully }
+    healthcheck:
+      test:
+        [
+          'CMD',
+          'node',
+          '-e',
+          "fetch('http://127.0.0.1:3002/health').then(r=>process.exit(r.ok?0:1)).catch(()=>process.exit(1))",
+        ]
+      interval: 5s
+      timeout: 3s
+      retries: 30
   frontend:
     build:
       context: .
       dockerfile: apps/frontend/Dockerfile
-    ports:
-      - "8080:80"
+    ports: ['127.0.0.1:8080:80']
     depends_on:
-      backend:
-        condition: service_healthy
+      backend: { condition: service_healthy }
     restart: unless-stopped
+    healthcheck:
+      test: ['CMD-SHELL', 'wget -q -O /dev/null http://127.0.0.1/api/ready']
+      interval: 3s
+      timeout: 3s
+      retries: 30
+volumes:
+  postgres_data:
+  rabbitmq_data:
+  mailpit_data:
+  influxdb_data:
+  influxdb_config:

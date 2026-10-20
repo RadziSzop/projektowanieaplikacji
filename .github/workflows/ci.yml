@@ -12,10 +12,20 @@ jobs:
           node-version: 24
           cache: npm
       - run: npm ci
+      - run: npm run env:init
       - run: npm run typecheck
       - run: npm run build
+      - run: npm test
+      - run: docker compose config --quiet
+      - run: docker compose up -d --wait postgres rabbitmq mailpit influxdb
+      - run: npm run test:integration
       - run: docker compose build
-      - run: docker compose up -d --wait
-      - run: curl --fail --retry 5 --retry-delay 2 http://localhost:8080/api/health
+      - run: docker compose up -d --wait --wait-timeout 180
+      - run: npm run test:smoke
+      - run: docker compose up -d --no-deps --force-recreate --wait backend license-service notification-worker
+      - run: node scripts/wait-ready.mjs
+      - run: npm run test:smoke
+      - if: failure()
+        run: docker compose logs --no-color --tail 100
       - if: always()
         run: docker compose down

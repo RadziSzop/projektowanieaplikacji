@@ -2,12 +2,34 @@
   "name": "projektowanieaplikacji",
   "version": "0.1.0",
   "private": true,
-  "workspaces": ["apps/*"],
-  "engines": { "node": ">=24.12.0 <25" },
-  "scripts": {
-    "dev": "concurrently -k -n frontend,backend \"npm run dev -w @app/frontend\" \"npm run dev -w @app/backend\"",
-    "build": "npm run build --workspaces",
-    "typecheck": "npm run typecheck --workspaces"
+  "workspaces": [
+    "apps/*",
+    "packages/*"
+  ],
+  "engines": {
+    "node": ">=24.12.0 <25"
   },
-  "devDependencies": { "concurrently": "^9.2.1" }
+  "scripts": {
+    "dev": "npm run build && node scripts/with-local-env.mjs node node_modules/concurrently/dist/bin/concurrently.js -k -n frontend,backend,licenses,notifications \"npm run dev -w @app/frontend\" \"npm run dev -w @app/backend\" \"npm run dev -w @app/license-service\" \"npm run dev -w @app/notification-worker\"",
+    "db:generate": "npm run generate -w @app/database",
+    "db:deploy": "npm run migrate -w @app/database",
+    "db:seed": "npm run seed -w @app/database",
+    "build:packages": "npm run db:generate && npm run build -w @app/contracts -w @app/license-core -w @app/database -w @app/messaging",
+    "build": "npm run build:packages && npm run build -w @app/backend -w @app/license-service -w @app/notification-worker -w @app/frontend",
+    "typecheck": "npm run build:packages && npm run typecheck --workspaces --if-present",
+    "test": "npm run build:packages && node --import tsx --test tests/*.test.ts apps/backend/test/*.test.ts",
+    "test:integration": "npm run build:packages && node scripts/test-setup.mjs && node --import tsx --test --test-concurrency=1 tests/integration/*.test.ts",
+    "env:init": "node scripts/init-env.mjs",
+    "test:smoke": "node scripts/smoke.mjs",
+    "verify": "node scripts/verify.mjs",
+    "dlq": "node apps/backend/dist/dlq.js",
+    "format": "prettier --write ."
+  },
+  "devDependencies": {
+    "concurrently": "^9.2.1",
+    "prettier": "^3.9.10",
+    "tsx": "^4.20.0",
+    "typescript": "^5.9.3",
+    "@types/node": "^24.0.0"
+  }
 }
