@@ -1,6 +1,7 @@
 import nodemailer from 'nodemailer';
 import { WorkError } from '@app/messaging';
 import type { DeliveryContext } from './service.js';
+import { renderLicenseEmail } from './email-template.js';
 
 export function createMailer(options: { host: string; port: number; from: string }) {
   const transport = nodemailer.createTransport({
@@ -21,7 +22,7 @@ export function createMailer(options: { host: string; port: number; from: string
           to: context.recipientEmail,
           messageId: `<license-${context.licenseId}@nova.local>`,
           subject: `Licencja Nova ${context.licenseId}`,
-          text: `Twój klucz licencyjny:\n\n${context.key}\n\nIdentyfikator licencji: ${context.licenseId}`,
+          ...renderLicenseEmail(context.key, context.licenseId),
         });
         if (!result.accepted?.length) throw new WorkError('SMTP_REJECTED', true);
       } catch (error) {
