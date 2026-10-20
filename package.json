@@ -3,19 +3,20 @@
   "version": "0.1.0",
   "private": true,
   "workspaces": [
-    "apps/*"
+    "apps/*",
+    "packages/*"
   ],
   "engines": {
     "node": ">=24.12.0 <25"
   },
   "scripts": {
-    "dev": "concurrently -k -n frontend,backend \"npm run dev -w @app/frontend\" \"npm run dev -w @app/backend\"",
-    "build": "npm run build --workspaces",
-    "typecheck": "npm run typecheck --workspaces",
     "format": "prettier --write ."
   },
   "devDependencies": {
     "concurrently": "^9.2.1",
-    "prettier": "^3.9.10"
+    "prettier": "^3.9.10",
+    "tsx": "^4.20.0",
+    "typescript": "^5.9.3",
+    "@types/node": "^24.0.0"
   }
 }

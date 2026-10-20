@@ -1,0 +1,22 @@
+{
+  "name": "@app/notification-worker",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "tsx watch src/index.ts",
+    "build": "tsc",
+    "typecheck": "tsc --noEmit",
+    "start": "node dist/index.js"
+  },
+  "dependencies": {
+    "@app/contracts": "*",
+    "@app/database": "*",
+    "@app/license-core": "*",
+    "@app/messaging": "*",
+    "nodemailer": "^10.1.7"
+  },
+  "devDependencies": {
+    "@types/nodemailer": "^7.0.0"
+  }
+}
