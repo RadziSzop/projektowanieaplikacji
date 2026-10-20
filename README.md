@@ -12,7 +12,9 @@ npm run env:init
 docker compose up --build -d --wait --wait-timeout 180
 ```
 
-`env:init` tworzy ignorowany `.env` z losowymi sekretami i nigdy nie nadpisuje istniejącego pliku. Dane administratora są w `ADMIN_EMAIL` i `ADMIN_PASSWORD`. Można też przygotować `.env` na podstawie `.env.example`; `KEY_ENCRYPTION_KEY` to dokładnie 32 losowe bajty zakodowane w base64. Hasła użyte w URL-ach bazy i brokera powinny zawierać znaki bezpieczne dla URL, tak jak generowane wartości hex.
+Repozytorium zawiera `.env` z danymi lokalnego środowiska demonstracyjnego. **To nie jest aplikacja produkcyjna. Przechowywanie sekretów w Git jest niebezpieczne: każda osoba z dostępem do repo zna te dane. Nie używaj tych haseł ani kluczy poza lokalnym demo.** W środowisku produkcyjnym sekrety muszą być dostarczane poza repozytorium i zastąpione nowymi wartościami.
+
+`env:init` tworzy `.env` z losowymi sekretami wyłącznie wtedy, gdy plik nie istnieje; nigdy nie nadpisuje istniejącego pliku. Dane administratora są w `ADMIN_EMAIL` i `ADMIN_PASSWORD`. Można też przygotować `.env` na podstawie `.env.example`; `KEY_ENCRYPTION_KEY` to dokładnie 32 losowe bajty zakodowane w base64. Hasła użyte w URL-ach bazy i brokera powinny zawierać znaki bezpieczne dla URL, tak jak generowane wartości hex.
 
 | Usługa                                 | Adres lokalny                    |
 | -------------------------------------- | -------------------------------- |
