@@ -14,7 +14,7 @@ export function money(price: number) {
   return (price / 100).toLocaleString('pl-PL', { style: 'currency', currency: 'PLN' });
 }
 
-export async function api<T>(path: string, body?: object): Promise<T> {
+export async function api<T>(path: string, body?: object, signal?: AbortSignal): Promise<T> {
   const response = await fetch(
     `/api/${path}`,
     body
@@ -22,8 +22,9 @@ export async function api<T>(path: string, body?: object): Promise<T> {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify(body),
+          signal,
         }
-      : {},
+      : { signal },
   );
   const data = await response.json().catch(() => null);
   if (!response.ok) throw new Error(data?.error || `Błąd API (${response.status}).`);

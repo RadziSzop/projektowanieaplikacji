@@ -26,6 +26,8 @@ Repozytorium zawiera `.env` z danymi lokalnego środowiska demonstracyjnego. **T
 
 RabbitMQ: użytkownik `licensing`, hasło `RABBITMQ_PASSWORD`. InfluxDB: użytkownik i organizacja `licensing`, hasło `INFLUXDB_PASSWORD`, bucket `events`. Wewnętrzne serwisy nie publikują portów na hoście. Wszystkie publikowane porty są związane z adresem loopback.
 
+Publiczny formularz weryfikacji licencji: http://localhost:8080/weryfikacja (link „Sprawdź licencję” w nawigacji). Nie wymaga logowania; pokazuje status ważności, wygaśnięcia lub unieważnienia oraz oddzielny komunikat przy niedostępności usługi. Klucz jest wysyłany w treści żądania, bez zapisywania go w adresie strony ani localStorage.
+
 Migracje i seed wykonuje jednorazowy kontener `migrate`. Seed tworzy produkty Standard/Plus/Pro i administratora; nie zmienia istniejących haseł, produktów ani konfiguracji i nie promuje konta utworzonego przez publiczną rejestrację.
 
 ```sh

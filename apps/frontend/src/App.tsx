@@ -6,6 +6,7 @@ import { Shop, Details } from './pages/Shop';
 import Cart from './pages/Cart';
 import { Checkout, Confirmation } from './pages/Checkout';
 import Auth from './pages/Auth';
+import VerifyLicense from './pages/VerifyLicense';
 
 export default function App() {
   const {
@@ -49,6 +50,7 @@ export default function App() {
           <p role="status">Ładowanie…</p>
         ) : (
           <Routes>
+            <Route path="/weryfikacja" element={<VerifyLicense />} />
             <Route path="/" element={<Shop products={products} add={add} />} />
             <Route path="/produkt/:id" element={<Details products={products} add={add} />} />
             <Route

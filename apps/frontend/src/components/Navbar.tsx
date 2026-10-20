@@ -12,6 +12,14 @@ export default function Navbar({ count, user, onLogout }: Props) {
         </Link>
         <nav className="flex flex-wrap items-center gap-2 text-sm">
           <NavLink
+            to="/weryfikacja"
+            className={({ isActive }) =>
+              `rounded-md px-3 py-2 ${isActive ? 'bg-zinc-800 text-white' : 'text-zinc-400 hover:text-white'}`
+            }
+          >
+            Sprawdź licencję
+          </NavLink>
+          <NavLink
             to="/koszyk"
             aria-label={`Koszyk (${count})`}
             className={({ isActive }) =>
