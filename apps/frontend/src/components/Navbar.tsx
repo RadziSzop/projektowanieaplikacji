@@ -37,6 +37,16 @@ export default function Navbar() {
             </svg>
             <span className="text-xs">{count}</span>
           </NavLink>
+          {user && (
+            <NavLink
+              to="/licencje"
+              className={({ isActive }) =>
+                `rounded-md px-3 py-2 ${isActive ? 'bg-zinc-800 text-white' : 'text-zinc-400 hover:text-white'}`
+              }
+            >
+              Moje licencje
+            </NavLink>
+          )}
           {user ? (
             <button
               type="button"

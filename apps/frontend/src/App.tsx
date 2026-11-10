@@ -10,6 +10,7 @@ import ProductDetails from './pages/ProductDetails';
 import Cart from './pages/Cart';
 import Checkout from './pages/Checkout';
 import Confirmation from './pages/Confirmation';
+import Licenses from './pages/Licenses';
 import Auth from './pages/Auth';
 import NotFound from './pages/NotFound';
 
@@ -40,6 +41,14 @@ export default function App() {
               />
               <Route path="/logowanie" element={<Auth key="login" register={false} />} />
               <Route path="/rejestracja" element={<Auth key="register" register />} />
+              <Route
+                path="/licencje"
+                element={
+                  <RequireAuth>
+                    <Licenses />
+                  </RequireAuth>
+                }
+              />
               <Route
                 path="/zamowienia/:id"
                 element={
