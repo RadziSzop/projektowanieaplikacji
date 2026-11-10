@@ -29,3 +29,23 @@ export type OrderPayload = BuyerDetails & { items: CartItem[] };
 export type OrderItem = { name: string; keys: string[] };
 
 export type Order = { id: number; total: number; items: OrderItem[] };
+
+export type JobStatus = 'PENDING' | 'PROCESSING' | 'COMPLETED' | 'FAILED';
+
+export type DeliveryStatus = 'PENDING' | 'PROCESSING' | 'SENT' | 'WRITTEN' | 'FAILED';
+
+export type OrderJob = {
+  jobId: string;
+  status: JobStatus;
+  errorCode: string | null;
+  deliveries: { kind: 'EMAIL' | 'METRICS'; status: DeliveryStatus; errorCode: string | null }[];
+};
+
+export type OrderDetails = Order & { jobs?: OrderJob[] };
+
+export type License = {
+  id: string;
+  key: string;
+  expiresAt: string | null;
+  revokedAt: string | null;
+};

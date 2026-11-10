@@ -40,7 +40,14 @@ export default function App() {
               />
               <Route path="/logowanie" element={<Auth key="login" register={false} />} />
               <Route path="/rejestracja" element={<Auth key="register" register />} />
-              <Route path="/gotowe" element={<Confirmation />} />
+              <Route
+                path="/zamowienia/:id"
+                element={
+                  <RequireAuth>
+                    <Confirmation />
+                  </RequireAuth>
+                }
+              />
               <Route path="*" element={<NotFound />} />
             </Routes>
           )}

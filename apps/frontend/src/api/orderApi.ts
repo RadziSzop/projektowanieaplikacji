@@ -1,6 +1,7 @@
-import type { Order, OrderPayload } from '../types';
-import { post } from './client';
+import type { Order, OrderDetails, OrderPayload } from '../types';
+import { get, post } from './client';
 
 export const OrderApi = {
   create: (payload: OrderPayload) => post<Order>('orders', payload),
+  get: (id: number) => get<OrderDetails>(`orders/${id}`),
 };

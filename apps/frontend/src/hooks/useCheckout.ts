@@ -16,7 +16,7 @@ export function useCheckout() {
         items: items.map(({ id, quantity }) => ({ id, quantity })),
       });
       clear();
-      navigate('/gotowe', { state: { order } });
+      navigate(`/zamowienia/${order.id}`, { state: { order } });
     });
   }
 
