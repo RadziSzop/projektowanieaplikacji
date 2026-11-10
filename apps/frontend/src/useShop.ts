@@ -2,6 +2,8 @@ import { useEffect, useState } from 'react';
 import { useLocation } from 'react-router-dom';
 import { AuthApi } from './api/authApi';
 import { ProductApi } from './api/productApi';
+import { useToast } from './components/Toast';
+import { errorMessage } from './lib/errors';
 import type { CartItem, Order, Product, User } from './types';
 
 function readCart(): CartItem[] {
@@ -20,8 +22,7 @@ export function useShop() {
   const [user, setUser] = useState<User | null>(null);
   const [cart, setCart] = useState<CartItem[]>(readCart);
   const [order, setOrder] = useState<Order | null>(null);
-  const [message, setMessage] = useState('');
-  const [error, setError] = useState('');
+  const toast = useToast();
 
   useEffect(() => {
     Promise.all([ProductApi.list(), AuthApi.me()])
@@ -29,21 +30,20 @@ export function useShop() {
         setProducts(products);
         setUser(user);
       })
-      .catch((e) => setError(e.message))
+      .catch((e) => toast(errorMessage(e), 'error'))
       .finally(() => setLoaded(true));
-  }, []);
+  }, [toast]);
   useEffect(() => {
     localStorage.setItem('koszyk', JSON.stringify(cart));
   }, [cart]);
   useEffect(() => {
     window.scrollTo(0, 0);
-    setMessage('');
   }, [pathname]);
 
   function add(product: Product) {
     const current = cart.find((item) => item.id === product.id);
     if (current && current.quantity >= 10) {
-      setMessage('Maksymalnie 10 sztuk produktu.');
+      toast('Maksymalnie 10 sztuk produktu.', 'error');
       return;
     }
     setCart(
@@ -53,7 +53,7 @@ export function useShop() {
           )
         : [...cart, { id: product.id, quantity: 1 }],
     );
-    setMessage(`Dodano Nova ${product.name} do koszyka.`);
+    toast(`Dodano Nova ${product.name} do koszyka.`);
   }
   function changeQuantity(id: number, quantity: number) {
     setCart(cart.map((item) => (item.id === id ? { ...item, quantity } : item)));
@@ -63,7 +63,7 @@ export function useShop() {
       await AuthApi.logout();
       setUser(null);
     } catch (e) {
-      setError((e as Error).message);
+      toast(errorMessage(e), 'error');
     }
   }
   const items = cart.flatMap((item) => {
@@ -85,8 +85,6 @@ export function useShop() {
     user,
     setUser,
     order,
-    message,
-    error,
     items,
     count,
     add,
