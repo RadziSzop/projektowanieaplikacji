@@ -1,8 +1,8 @@
 import { CartRow } from '../components/cart/CartRow';
+import { EmptyCart } from '../components/cart/EmptyCart';
 import { OrderSummary } from '../components/cart/OrderSummary';
 import { PageLayout } from '../components/layout/PageLayout';
 import { ButtonLink } from '../components/ui/Button';
-import { TextLink } from '../components/ui/TextLink';
 import { useAuth } from '../hooks/useAuth';
 import { useCart } from '../hooks/useCart';
 
@@ -12,9 +12,7 @@ export default function Cart() {
   return (
     <PageLayout title="Koszyk">
       {!items.length ? (
-        <p>
-          Koszyk jest pusty. <TextLink to="/">Przejdź do sklepu</TextLink>
-        </p>
+        <EmptyCart />
       ) : (
         <div className="space-y-6">
           {items.map((item) => (

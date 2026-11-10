@@ -5,9 +5,11 @@ import { RequireAuth } from './components/RequireAuth';
 import { useAuth } from './hooks/useAuth';
 import { useProducts } from './hooks/useProducts';
 import { useScrollToTop } from './hooks/useScrollToTop';
-import { Shop, Details } from './pages/Shop';
+import Shop from './pages/Shop';
+import ProductDetails from './pages/ProductDetails';
 import Cart from './pages/Cart';
-import { Checkout, Confirmation } from './pages/Checkout';
+import Checkout from './pages/Checkout';
+import Confirmation from './pages/Confirmation';
 import Auth from './pages/Auth';
 import NotFound from './pages/NotFound';
 
@@ -26,7 +28,7 @@ export default function App() {
           ) : (
             <Routes>
               <Route path="/" element={<Shop />} />
-              <Route path="/produkt/:id" element={<Details />} />
+              <Route path="/produkt/:id" element={<ProductDetails />} />
               <Route path="/koszyk" element={<Cart />} />
               <Route
                 path="/zamowienie"
