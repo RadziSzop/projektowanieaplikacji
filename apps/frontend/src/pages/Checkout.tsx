@@ -1,12 +1,18 @@
 import { useState, type FormEvent } from 'react';
-import { Link, useLocation, useNavigate } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 import { OrderApi } from '../api/orderApi';
-import { money } from '../lib/money';
-import type { BuyerDetails, Order } from '../types';
+import { OrderSummary } from '../components/cart/OrderSummary';
+import { PageLayout } from '../components/layout/PageLayout';
+import { Alert } from '../components/ui/Alert';
+import { Button } from '../components/ui/Button';
+import { FormField } from '../components/ui/FormField';
+import { Panel, Section } from '../components/ui/Panel';
+import { TextLink } from '../components/ui/TextLink';
 import { useAuth } from '../hooks/useAuth';
 import { useCart } from '../hooks/useCart';
 import { errorMessage } from '../lib/errors';
-import { button, Field, link, panel, Summary } from '../components/ui';
+import { money } from '../lib/money';
+import type { BuyerDetails, Order } from '../types';
 
 export function Checkout() {
   const user = useAuth().user!;
@@ -34,84 +40,78 @@ export function Checkout() {
   }
   if (!items.length)
     return (
-      <p>
-        Koszyk jest pusty.{' '}
-        <Link className={link} to="/">
-          Przejdź do sklepu
-        </Link>
-      </p>
+      <PageLayout title="Zamówienie">
+        <p>
+          Koszyk jest pusty. <TextLink to="/">Przejdź do sklepu</TextLink>
+        </p>
+      </PageLayout>
     );
   return (
-    <>
-      <h1 className="mb-8 text-3xl font-semibold tracking-tight">Zamówienie</h1>
-      <div className="grid items-start gap-5 md:grid-cols-2">
-        <form className={panel + ' space-y-4'} onSubmit={submit}>
-          <h2 className="font-semibold">Dane kupującego</h2>
-          <Field
-            label="Imię i nazwisko"
-            name="name"
-            autoComplete="name"
-            defaultValue={user.name}
-            required
-            maxLength={80}
-          />
-          <Field
-            label="Adres e-mail"
-            name="email"
-            type="email"
-            autoComplete="email"
-            defaultValue={user.email}
-            required
-            maxLength={200}
-          />
-          <Field
-            label="Ulica i numer"
-            name="address"
-            autoComplete="street-address"
-            required
-            maxLength={200}
-          />
-          <Field
-            label="Kod pocztowy"
-            name="postcode"
-            autoComplete="postal-code"
-            placeholder="00-001"
-            pattern="[0-9]{2}-[0-9]{3}"
-            required
-          />
-          <Field
-            label="Miejscowość"
-            name="city"
-            autoComplete="address-level2"
-            required
-            maxLength={80}
-          />
-          {error && (
-            <p role="alert" className="text-sm text-red-300">
-              {error}
-            </p>
-          )}
-          <button className={button} disabled={busy}>
-            {busy ? 'Zapisywanie…' : 'Zamów i zapłać'}
-          </button>
-        </form>
-        <Summary items={items} />
+    <PageLayout title="Zamówienie">
+      <div className="grid items-start gap-6 md:grid-cols-2">
+        <Panel>
+          <form className="space-y-5" onSubmit={submit}>
+            <h2 className="font-semibold">Dane kupującego</h2>
+            <FormField
+              label="Imię i nazwisko"
+              name="name"
+              autoComplete="name"
+              defaultValue={user.name}
+              required
+              maxLength={80}
+            />
+            <FormField
+              label="Adres e-mail"
+              name="email"
+              type="email"
+              autoComplete="email"
+              defaultValue={user.email}
+              required
+              maxLength={200}
+            />
+            <FormField
+              label="Ulica i numer"
+              name="address"
+              autoComplete="street-address"
+              required
+              maxLength={200}
+            />
+            <FormField
+              label="Kod pocztowy"
+              name="postcode"
+              autoComplete="postal-code"
+              placeholder="00-001"
+              pattern="[0-9]{2}-[0-9]{3}"
+              required
+            />
+            <FormField
+              label="Miejscowość"
+              name="city"
+              autoComplete="address-level2"
+              required
+              maxLength={80}
+            />
+            <Alert>{error}</Alert>
+            <Button type="submit" disabled={busy}>
+              {busy ? 'Zapisywanie…' : 'Zamów i zapłać'}
+            </Button>
+          </form>
+        </Panel>
+        <OrderSummary items={items} />
       </div>
-    </>
+    </PageLayout>
   );
 }
 
 export function Confirmation() {
   const order: Order | null = useLocation().state?.order ?? null;
   return (
-    <div className="max-w-xl space-y-5">
-      <h1 className="text-2xl font-semibold">{order ? 'Zamówienie złożone' : 'Brak zamówienia'}</h1>
+    <PageLayout title={order ? 'Zamówienie złożone' : 'Brak zamówienia'} width="medium" back>
       {order && (
-        <div className={panel + ' space-y-4'}>
-          <p>Zamówienie nr {order.id}</p>
+        <Section title={`Zamówienie nr ${order.id}`}>
           {order.items.map((item) => (
             <div key={item.name}>
-              <h2 className="mb-2 font-semibold">Nova {item.name}</h2>
+              <h3 className="mb-2 font-semibold">Nova {item.name}</h3>
               {item.keys.map((key) => (
                 <code className="block break-all text-sm" key={key}>
                   {key}
@@ -119,12 +119,9 @@ export function Confirmation() {
               ))}
             </div>
           ))}
-          <p>Razem: {money(order.total)}</p>
-        </div>
+          <p className="border-t border-zinc-700 pt-4 font-semibold">Razem: {money(order.total)}</p>
+        </Section>
       )}
-      <Link className={link} to="/">
-        Wróć do sklepu
-      </Link>
-    </div>
+    </PageLayout>
   );
 }

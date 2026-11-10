@@ -1,62 +1,51 @@
-import { Link, useParams } from 'react-router-dom';
-import { money } from '../lib/money';
-import { button, link, panel } from '../components/ui';
+import { useParams } from 'react-router-dom';
+import { PageLayout } from '../components/layout/PageLayout';
+import { ProductCard } from '../components/product/ProductCard';
+import { Button } from '../components/ui/Button';
+import { Panel } from '../components/ui/Panel';
 import { useCart } from '../hooks/useCart';
 import { useProducts } from '../hooks/useProducts';
+import { money } from '../lib/money';
 
 export function Shop() {
   const { products } = useProducts();
   const { add } = useCart();
   return (
-    <>
-      <div className="mb-8 border-b border-zinc-800 pb-6">
-        <h1 className="text-3xl font-semibold tracking-tight">Licencje Nova</h1>
-        <p className="mt-2 text-sm text-zinc-400">Standard, Plus i Pro</p>
-      </div>
+    <PageLayout title="Licencje Nova" description="Standard, Plus i Pro">
       {!products.length && (
-        <p className={panel + ' text-sm text-zinc-400'}>Brak produktów do wyświetlenia.</p>
+        <Panel className="text-sm text-zinc-400">Brak produktów do wyświetlenia.</Panel>
       )}
-      <div className="grid gap-5 sm:grid-cols-3">
+      <div className="grid gap-6 sm:grid-cols-3">
         {products.map((product) => (
-          <article className={panel + ' flex flex-col'} key={product.id}>
-            <h2 className="mb-3 text-xl font-semibold">{product.name}</h2>
-            <p className="mb-8 flex-1 text-sm leading-6 text-zinc-400">{product.description}</p>
-            <p className="mb-5 text-2xl font-semibold tracking-tight">{money(product.price)}</p>
-            <button className={button + ' w-full'} onClick={() => add(product)}>
-              Dodaj do koszyka
-            </button>
-            <Link className={link + ' mt-4 text-center'} to={`/produkt/${product.id}`}>
-              Szczegóły produktu
-            </Link>
-          </article>
+          <ProductCard key={product.id} product={product} onAdd={() => add(product)} />
         ))}
       </div>
-    </>
+    </PageLayout>
   );
 }
 
 export function Details() {
+  const { id } = useParams();
   const { products } = useProducts();
   const { add } = useCart();
-  const { id } = useParams();
   const product = products.find((item) => String(item.id) === id);
-  if (!product) return <p>Nie znaleziono produktu.</p>;
+  if (!product) return <PageLayout title="Nie znaleziono produktu" width="medium" back />;
   return (
-    <div className={panel + ' max-w-xl space-y-6'}>
-      <Link className={link} to="/">
-        Wróć do sklepu
-      </Link>
-      <h1 className="text-2xl font-semibold">Nova {product.name}</h1>
-      <p>{product.description}</p>
-      <ul className="list-inside list-disc text-sm text-zinc-400">
-        {product.features.map((feature) => (
-          <li key={feature}>{feature}</li>
-        ))}
-      </ul>
-      <p className="text-lg font-semibold">{money(product.price)}</p>
-      <button className={button} onClick={() => add(product)}>
-        Dodaj do koszyka
-      </button>
-    </div>
+    <PageLayout
+      title={`Nova ${product.name}`}
+      description={product.description}
+      width="medium"
+      back
+    >
+      <Panel className="space-y-6">
+        <ul className="list-inside list-disc text-sm text-zinc-400">
+          {product.features.map((feature) => (
+            <li key={feature}>{feature}</li>
+          ))}
+        </ul>
+        <p className="text-lg font-semibold">{money(product.price)}</p>
+        <Button onClick={() => add(product)}>Dodaj do koszyka</Button>
+      </Panel>
+    </PageLayout>
   );
 }

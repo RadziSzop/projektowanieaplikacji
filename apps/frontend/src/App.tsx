@@ -1,5 +1,4 @@
-import { Link, Route, Routes } from 'react-router-dom';
-import { link } from './components/ui';
+import { Route, Routes } from 'react-router-dom';
 import Navbar from './components/Navbar';
 import { ErrorBoundary } from './components/ErrorBoundary';
 import { RequireAuth } from './components/RequireAuth';
@@ -10,6 +9,7 @@ import { Shop, Details } from './pages/Shop';
 import Cart from './pages/Cart';
 import { Checkout, Confirmation } from './pages/Checkout';
 import Auth from './pages/Auth';
+import NotFound from './pages/NotFound';
 
 export default function App() {
   const auth = useAuth();
@@ -39,17 +39,7 @@ export default function App() {
               <Route path="/logowanie" element={<Auth key="login" register={false} />} />
               <Route path="/rejestracja" element={<Auth key="register" register />} />
               <Route path="/gotowe" element={<Confirmation />} />
-              <Route
-                path="*"
-                element={
-                  <>
-                    <h1 className="mb-4 text-2xl font-semibold">Nie znaleziono strony</h1>
-                    <Link className={link} to="/">
-                      Wróć do sklepu
-                    </Link>
-                  </>
-                }
-              />
+              <Route path="*" element={<NotFound />} />
             </Routes>
           )}
         </ErrorBoundary>

@@ -1,9 +1,14 @@
 import { useState, type FormEvent } from 'react';
-import { Link, useLocation, useNavigate } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
+import { PageLayout } from '../components/layout/PageLayout';
+import { Alert } from '../components/ui/Alert';
+import { Button } from '../components/ui/Button';
+import { FormField } from '../components/ui/FormField';
+import { Panel } from '../components/ui/Panel';
+import { TextLink } from '../components/ui/TextLink';
 import { useAuth } from '../hooks/useAuth';
 import { errorMessage } from '../lib/errors';
 import type { RegisterPayload } from '../types';
-import { button, Field, link, panel } from '../components/ui';
 
 export default function Auth({ register }: { register: boolean }) {
   const auth = useAuth();
@@ -34,59 +39,54 @@ export default function Auth({ register }: { register: boolean }) {
     }
   }
   return (
-    <div className="mx-auto max-w-md">
-      <h1 className="mb-2 text-3xl font-semibold tracking-tight">
-        {register ? 'Rejestracja' : 'Logowanie'}
-      </h1>
-      <p className="mb-7 text-sm text-zinc-400">
-        {register ? 'Podaj dane do utworzenia konta.' : 'Wprowadź dane swojego konta.'}
-      </p>
-      {from === '/zamowienie' && (
-        <p className="mb-4 text-sm text-zinc-400">Zaloguj się, aby złożyć zamówienie.</p>
-      )}
-      <form onSubmit={submit} className={panel + ' space-y-5'}>
-        {register && (
-          <Field label="Imię" name="name" autoComplete="given-name" required maxLength={80} />
-        )}
-        <Field
-          label="Adres e-mail"
-          name="email"
-          type="email"
-          autoComplete="email"
-          required
-          maxLength={200}
-        />
-        <Field
-          label="Hasło"
-          name="password"
-          type="password"
-          autoComplete={register ? 'new-password' : 'current-password'}
-          required
-          minLength={register ? 8 : 1}
-          maxLength={128}
-        />
-        {register && <p className="text-xs text-zinc-400">Hasło musi mieć co najmniej 8 znaków.</p>}
-        {error && (
-          <p role="alert" className="text-sm text-red-300">
-            {error}
-          </p>
-        )}
-        {message && (
-          <p role="status" className="text-sm">
-            {message}
-          </p>
-        )}
-        <button className={button + ' w-full'} disabled={busy}>
-          {busy ? 'Zapisywanie…' : register ? 'Utwórz konto' : 'Zaloguj się'}
-        </button>
-      </form>
-      <Link
-        className={link + ' mt-6 block text-center'}
+    <PageLayout
+      title={register ? 'Rejestracja' : 'Logowanie'}
+      description={
+        from === '/zamowienie'
+          ? 'Zaloguj się, aby złożyć zamówienie.'
+          : register
+            ? 'Podaj dane do utworzenia konta.'
+            : 'Wprowadź dane swojego konta.'
+      }
+      width="narrow"
+    >
+      <Panel>
+        <form onSubmit={submit} className="space-y-5">
+          {register && (
+            <FormField label="Imię" name="name" autoComplete="given-name" required maxLength={80} />
+          )}
+          <FormField
+            label="Adres e-mail"
+            name="email"
+            type="email"
+            autoComplete="email"
+            required
+            maxLength={200}
+          />
+          <FormField
+            label="Hasło"
+            name="password"
+            type="password"
+            autoComplete={register ? 'new-password' : 'current-password'}
+            hint={register ? 'Hasło musi mieć co najmniej 8 znaków.' : undefined}
+            required
+            minLength={register ? 8 : 1}
+            maxLength={128}
+          />
+          <Alert>{error}</Alert>
+          <Alert tone="info">{message}</Alert>
+          <Button type="submit" full disabled={busy}>
+            {busy ? 'Zapisywanie…' : register ? 'Utwórz konto' : 'Zaloguj się'}
+          </Button>
+        </form>
+      </Panel>
+      <TextLink
+        className="block text-center"
         to={register ? '/logowanie' : '/rejestracja'}
         state={{ from }}
       >
         {register ? 'Masz konto? Zaloguj się' : 'Nie masz konta? Zarejestruj się'}
-      </Link>
-    </div>
+      </TextLink>
+    </PageLayout>
   );
 }

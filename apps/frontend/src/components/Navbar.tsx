@@ -1,6 +1,7 @@
 import { Link, NavLink } from 'react-router-dom';
 import { useAuth } from '../hooks/useAuth';
 import { useCart } from '../hooks/useCart';
+import { buttonClass } from './ui/Button';
 
 export default function Navbar() {
   const { user, logout } = useAuth();
@@ -38,16 +39,14 @@ export default function Navbar() {
           </NavLink>
           {user ? (
             <button
+              type="button"
               className="cursor-pointer px-3 py-2 text-zinc-400 hover:text-white"
               onClick={logout}
             >
               Wyloguj ({user.name})
             </button>
           ) : (
-            <Link
-              className="rounded-md border border-zinc-700 px-3 py-2 hover:bg-zinc-800"
-              to="/logowanie"
-            >
+            <Link className={buttonClass({ variant: 'secondary' })} to="/logowanie">
               Zaloguj się
             </Link>
           )}
