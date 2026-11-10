@@ -3,51 +3,37 @@ import { link } from './components/ui';
 import Navbar from './components/Navbar';
 import { ErrorBoundary } from './components/ErrorBoundary';
 import { useShop } from './useShop';
+import { useCart } from './hooks/useCart';
+import { useProducts } from './hooks/useProducts';
 import { Shop, Details } from './pages/Shop';
 import Cart from './pages/Cart';
 import { Checkout, Confirmation } from './pages/Checkout';
 import Auth from './pages/Auth';
 
 export default function App() {
-  const {
-    products,
-    loaded,
-    user,
-    setUser,
-    order,
-    items,
-    count,
-    add,
-    changeQuantity,
-    remove,
-    completeOrder,
-    logout,
-  } = useShop();
+  const { loaded, user, setUser, order, completeOrder, logout } = useShop();
+  const { count } = useCart();
+  const { loading } = useProducts();
 
   return (
     <>
       <Navbar count={count} user={user} onLogout={logout} />
       <main className="mx-auto max-w-5xl px-6 py-10 sm:py-12">
         <ErrorBoundary>
-          {!loaded ? (
+          {!loaded || loading ? (
             <p role="status">Ładowanie…</p>
           ) : (
             <Routes>
-              <Route path="/" element={<Shop products={products} add={add} />} />
-              <Route path="/produkt/:id" element={<Details products={products} add={add} />} />
-              <Route
-                path="/koszyk"
-                element={
-                  <Cart items={items} user={user} changeQuantity={changeQuantity} remove={remove} />
-                }
-              />
+              <Route path="/" element={<Shop />} />
+              <Route path="/produkt/:id" element={<Details />} />
+              <Route path="/koszyk" element={<Cart user={user} />} />
               <Route
                 path="/zamowienie"
                 element={
                   !user ? (
                     <Navigate to="/logowanie" state={{ from: '/zamowienie' }} replace />
                   ) : (
-                    <Checkout items={items} user={user} onOrder={completeOrder} />
+                    <Checkout user={user} onOrder={completeOrder} />
                   )
                 }
               />

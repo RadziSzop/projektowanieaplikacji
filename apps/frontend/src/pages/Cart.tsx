@@ -1,16 +1,12 @@
 import { Link } from 'react-router-dom';
 import { money } from '../lib/money';
-import type { CartProduct, User } from '../types';
+import { MAX_QUANTITY } from '../services/cartService';
+import type { User } from '../types';
+import { useCart } from '../hooks/useCart';
 import { button, link, panel, Summary } from '../components/ui';
 
-type Props = {
-  items: CartProduct[];
-  user: User | null;
-  changeQuantity: (id: number, quantity: number) => void;
-  remove: (id: number) => void;
-};
-
-export default function Cart({ items, user, changeQuantity, remove }: Props) {
+export default function Cart({ user }: { user: User | null }) {
+  const { items, changeQuantity, remove } = useCart();
   return (
     <>
       <h1 className="mb-8 text-3xl font-semibold tracking-tight">Koszyk</h1>
@@ -36,7 +32,7 @@ export default function Cart({ items, user, changeQuantity, remove }: Props) {
                   value={item.quantity}
                   onChange={(event) => changeQuantity(item.id, Number(event.target.value))}
                 >
-                  {Array.from({ length: 10 }, (_, i) => (
+                  {Array.from({ length: MAX_QUANTITY }, (_, i) => (
                     <option key={i + 1}>{i + 1}</option>
                   ))}
                 </select>

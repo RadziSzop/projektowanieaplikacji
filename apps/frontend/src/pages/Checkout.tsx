@@ -2,18 +2,12 @@ import { useState, type FormEvent } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { OrderApi } from '../api/orderApi';
 import { money } from '../lib/money';
-import type { BuyerDetails, CartProduct, Order, User } from '../types';
+import type { BuyerDetails, Order, User } from '../types';
+import { useCart } from '../hooks/useCart';
 import { button, Field, link, panel, Summary } from '../components/ui';
 
-export function Checkout({
-  items,
-  user,
-  onOrder,
-}: {
-  items: CartProduct[];
-  user: User;
-  onOrder: (order: Order) => void;
-}) {
+export function Checkout({ user, onOrder }: { user: User; onOrder: (order: Order) => void }) {
+  const { items } = useCart();
   const [error, setError] = useState('');
   const [busy, setBusy] = useState(false);
   const navigate = useNavigate();

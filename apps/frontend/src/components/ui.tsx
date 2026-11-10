@@ -1,5 +1,6 @@
 import type { InputHTMLAttributes } from 'react';
 import { money } from '../lib/money';
+import { CartService } from '../services/cartService';
 import type { CartProduct } from '../types';
 
 export const button =
@@ -23,7 +24,7 @@ export function Field({
 }
 
 export function Summary({ items }: { items: CartProduct[] }) {
-  const total = items.reduce((sum, item) => sum + item.price * item.quantity, 0);
+  const total = CartService.total(items);
   return (
     <div className={panel + ' space-y-3'}>
       <h2 className="font-semibold">Podsumowanie</h2>

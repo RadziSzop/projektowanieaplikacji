@@ -1,11 +1,12 @@
 import { Link, useParams } from 'react-router-dom';
 import { money } from '../lib/money';
-import type { Product } from '../types';
 import { button, link, panel } from '../components/ui';
+import { useCart } from '../hooks/useCart';
+import { useProducts } from '../hooks/useProducts';
 
-type Props = { products: Product[]; add: (product: Product) => void };
-
-export function Shop({ products, add }: Props) {
+export function Shop() {
+  const { products } = useProducts();
+  const { add } = useCart();
   return (
     <>
       <div className="mb-8 border-b border-zinc-800 pb-6">
@@ -34,7 +35,9 @@ export function Shop({ products, add }: Props) {
   );
 }
 
-export function Details({ products, add }: Props) {
+export function Details() {
+  const { products } = useProducts();
+  const { add } = useCart();
   const { id } = useParams();
   const product = products.find((item) => String(item.id) === id);
   if (!product) return <p>Nie znaleziono produktu.</p>;
