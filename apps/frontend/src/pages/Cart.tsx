@@ -1,5 +1,6 @@
 import { Link } from 'react-router-dom';
-import { money, type CartProduct, type User } from '../api';
+import { money } from '../lib/money';
+import type { CartProduct, User } from '../types';
 import { button, link, panel, Summary } from '../components/ui';
 
 type Props = {

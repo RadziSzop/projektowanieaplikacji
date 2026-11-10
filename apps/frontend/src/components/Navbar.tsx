@@ -1,5 +1,5 @@
 import { Link, NavLink } from 'react-router-dom';
-import type { User } from '../api';
+import type { User } from '../types';
 
 type Props = { count: number; user: User | null; onLogout: () => void };
 

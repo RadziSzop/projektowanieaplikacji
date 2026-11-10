@@ -1,6 +1,8 @@
 import { useState, type FormEvent } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { api, money, type CartProduct, type Order, type User } from '../api';
+import { OrderApi } from '../api/orderApi';
+import { money } from '../lib/money';
+import type { BuyerDetails, CartProduct, Order, User } from '../types';
 import { button, Field, link, panel, Summary } from '../components/ui';
 
 export function Checkout({
@@ -19,9 +21,9 @@ export function Checkout({
     event.preventDefault();
     setError('');
     setBusy(true);
-    const data = Object.fromEntries(new FormData(event.currentTarget));
+    const data = Object.fromEntries(new FormData(event.currentTarget)) as BuyerDetails;
     try {
-      const order = await api<Order>('orders', {
+      const order = await OrderApi.create({
         ...data,
         items: items.map((item) => ({ id: item.id, quantity: item.quantity })),
       });

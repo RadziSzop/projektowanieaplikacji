@@ -1,6 +1,17 @@
 import { useEffect, useState } from 'react';
 import { useLocation } from 'react-router-dom';
-import { api, readCart, type CartItem, type Order, type Product, type User } from './api';
+import { AuthApi } from './api/authApi';
+import { ProductApi } from './api/productApi';
+import type { CartItem, Order, Product, User } from './types';
+
+function readCart(): CartItem[] {
+  try {
+    const saved: unknown = JSON.parse(localStorage.getItem('koszyk') || '[]');
+    return Array.isArray(saved) ? saved : [];
+  } catch {
+    return [];
+  }
+}
 
 export function useShop() {
   const { pathname } = useLocation();
@@ -13,7 +24,7 @@ export function useShop() {
   const [error, setError] = useState('');
 
   useEffect(() => {
-    Promise.all([api<Product[]>('products'), api<User | null>('me')])
+    Promise.all([ProductApi.list(), AuthApi.me()])
       .then(([products, user]) => {
         setProducts(products);
         setUser(user);
@@ -49,7 +60,7 @@ export function useShop() {
   }
   async function logout() {
     try {
-      await api('logout', {});
+      await AuthApi.logout();
       setUser(null);
     } catch (e) {
       setError((e as Error).message);

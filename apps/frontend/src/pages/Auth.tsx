@@ -1,6 +1,7 @@
 import { useState, type FormEvent } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
-import { api, type User } from '../api';
+import { AuthApi } from '../api/authApi';
+import type { RegisterPayload, User } from '../types';
 import { button, Field, link, panel } from '../components/ui';
 
 export default function Auth({
@@ -22,13 +23,13 @@ export default function Auth({
     setBusy(true);
     setError('');
     setMessage('');
-    const data = Object.fromEntries(new FormData(event.currentTarget));
+    const data = Object.fromEntries(new FormData(event.currentTarget)) as RegisterPayload;
     try {
       if (register) {
-        const result = await api<{ message: string }>('register', data);
+        const result = await AuthApi.register(data);
         setMessage(result.message);
       } else {
-        onLogin(await api<User>('login', data));
+        onLogin(await AuthApi.login(data));
         navigate(from, { replace: true });
       }
     } catch (e) {
