@@ -1,11 +1,12 @@
 import { Link } from 'react-router-dom';
 import { money } from '../lib/money';
 import { MAX_QUANTITY } from '../services/cartService';
-import type { User } from '../types';
+import { useAuth } from '../hooks/useAuth';
 import { useCart } from '../hooks/useCart';
 import { button, link, panel, Summary } from '../components/ui';
 
-export default function Cart({ user }: { user: User | null }) {
+export default function Cart() {
+  const { user } = useAuth();
   const { items, changeQuantity, remove } = useCart();
   return (
     <>

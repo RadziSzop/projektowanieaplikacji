@@ -1,9 +1,10 @@
 import { Link, NavLink } from 'react-router-dom';
-import type { User } from '../types';
+import { useAuth } from '../hooks/useAuth';
+import { useCart } from '../hooks/useCart';
 
-type Props = { count: number; user: User | null; onLogout: () => void };
-
-export default function Navbar({ count, user, onLogout }: Props) {
+export default function Navbar() {
+  const { user, logout } = useAuth();
+  const { count } = useCart();
   return (
     <header className="border-b border-zinc-800">
       <div className="mx-auto flex max-w-5xl flex-wrap items-center justify-between gap-4 px-6 py-5">
@@ -38,7 +39,7 @@ export default function Navbar({ count, user, onLogout }: Props) {
           {user ? (
             <button
               className="cursor-pointer px-3 py-2 text-zinc-400 hover:text-white"
-              onClick={onLogout}
+              onClick={logout}
             >
               Wyloguj ({user.name})
             </button>

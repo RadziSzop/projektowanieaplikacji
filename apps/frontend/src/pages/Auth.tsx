@@ -1,16 +1,12 @@
 import { useState, type FormEvent } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
-import { AuthApi } from '../api/authApi';
-import type { RegisterPayload, User } from '../types';
+import { useAuth } from '../hooks/useAuth';
+import { errorMessage } from '../lib/errors';
+import type { RegisterPayload } from '../types';
 import { button, Field, link, panel } from '../components/ui';
 
-export default function Auth({
-  register,
-  onLogin,
-}: {
-  register: boolean;
-  onLogin: (user: User) => void;
-}) {
+export default function Auth({ register }: { register: boolean }) {
+  const auth = useAuth();
   const [error, setError] = useState('');
   const [message, setMessage] = useState('');
   const [busy, setBusy] = useState(false);
@@ -26,14 +22,13 @@ export default function Auth({
     const data = Object.fromEntries(new FormData(event.currentTarget)) as RegisterPayload;
     try {
       if (register) {
-        const result = await AuthApi.register(data);
-        setMessage(result.message);
+        setMessage(await auth.register(data));
       } else {
-        onLogin(await AuthApi.login(data));
+        await auth.login(data);
         navigate(from, { replace: true });
       }
     } catch (e) {
-      setError((e as Error).message);
+      setError(errorMessage(e));
     } finally {
       setBusy(false);
     }

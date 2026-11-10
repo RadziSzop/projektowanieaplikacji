@@ -1,13 +1,16 @@
 import { useState, type FormEvent } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { OrderApi } from '../api/orderApi';
 import { money } from '../lib/money';
-import type { BuyerDetails, Order, User } from '../types';
+import type { BuyerDetails, Order } from '../types';
+import { useAuth } from '../hooks/useAuth';
 import { useCart } from '../hooks/useCart';
+import { errorMessage } from '../lib/errors';
 import { button, Field, link, panel, Summary } from '../components/ui';
 
-export function Checkout({ user, onOrder }: { user: User; onOrder: (order: Order) => void }) {
-  const { items } = useCart();
+export function Checkout() {
+  const user = useAuth().user!;
+  const { items, clear } = useCart();
   const [error, setError] = useState('');
   const [busy, setBusy] = useState(false);
   const navigate = useNavigate();
@@ -21,10 +24,10 @@ export function Checkout({ user, onOrder }: { user: User; onOrder: (order: Order
         ...data,
         items: items.map((item) => ({ id: item.id, quantity: item.quantity })),
       });
-      onOrder(order);
-      navigate('/gotowe');
+      clear();
+      navigate('/gotowe', { state: { order } });
     } catch (e) {
-      setError((e as Error).message);
+      setError(errorMessage(e));
     } finally {
       setBusy(false);
     }
@@ -98,7 +101,8 @@ export function Checkout({ user, onOrder }: { user: User; onOrder: (order: Order
   );
 }
 
-export function Confirmation({ order }: { order: Order | null }) {
+export function Confirmation() {
+  const order: Order | null = useLocation().state?.order ?? null;
   return (
     <div className="max-w-xl space-y-5">
       <h1 className="text-2xl font-semibold">{order ? 'Zamówienie złożone' : 'Brak zamówienia'}</h1>
