@@ -3,7 +3,7 @@ import assert from 'node:assert/strict';
 import { randomBytes } from 'node:crypto';
 
 test('format validation rejects ambiguous or insecure configurations and forged cart prices', async () => {
-  const m = await import('../packages/contracts/src/index.js').catch(() => null);
+  const m = await import('../../packages/contracts/src/index.js').catch(() => null);
   assert.ok(m, 'Shared boundary schemas must exist');
   assert.equal(m.configSchema.safeParse({ alphabet: 'AAA' }).success, false);
   assert.equal(m.configSchema.safeParse({ segmentCount: 1, segmentLength: 1 }).success, false);
@@ -30,8 +30,8 @@ test('format validation rejects ambiguous or insecure configurations and forged 
 });
 
 test('generated keys obey immutable format and checksum rejects changed characters', async () => {
-  const contracts = await import('../packages/contracts/src/index.js').catch(() => null);
-  const core = await import('../packages/license-core/src/index.js').catch(() => null);
+  const contracts = await import('../../packages/contracts/src/index.js').catch(() => null);
+  const core = await import('../../packages/license-core/src/index.js').catch(() => null);
   assert.ok(core && contracts, 'Key generation must exist');
   const format = contracts.configSchema.parse({});
   const key = core.generateKey(format);
@@ -48,8 +48,8 @@ test('generated keys obey immutable format and checksum rejects changed characte
 });
 
 test('encryption authenticates the ciphertext and password checks reject the wrong secret', async () => {
-  const core = await import('../packages/license-core/src/index.js').catch(() => null);
-  const security = await import('../packages/database/src/password.js').catch(() => null);
+  const core = await import('../../packages/license-core/src/index.js').catch(() => null);
+  const security = await import('../../packages/database/src/password.js').catch(() => null);
   assert.ok(core && security, 'Encryption and password protection must exist');
   const secret = randomBytes(32).toString('base64');
   const encrypted = core.encryptKey('NOVA-TEST', secret);

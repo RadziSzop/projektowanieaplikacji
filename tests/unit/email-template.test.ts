@@ -1,6 +1,6 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { renderLicenseEmail } from '../apps/notification-worker/src/email-template.js';
+import { renderLicenseEmail } from '../../apps/notification-worker/src/email-template.js';
 
 test('license email includes HTML and plain text and escapes configurable key characters', () => {
   const key = 'NOVA-<A&B>"\'';

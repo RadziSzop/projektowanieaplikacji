@@ -17,10 +17,10 @@
     "build:packages": "npm run db:generate && npm run build -w @app/contracts -w @app/license-core -w @app/database -w @app/messaging",
     "build": "npm run build:packages && npm run build -w @app/backend -w @app/license-service -w @app/notification-worker -w @app/frontend",
     "typecheck": "npm run build:packages && npm run typecheck --workspaces --if-present",
-    "test": "npm run build:packages && node --import tsx --test tests/*.test.ts apps/backend/test/*.test.ts",
+    "test": "npm run build:packages && node --import tsx --test tests/unit/*.test.ts",
     "test:integration": "npm run build:packages && node scripts/test-setup.mjs && node --import tsx --test --test-concurrency=1 tests/integration/*.test.ts",
     "env:init": "node scripts/init-env.mjs",
-    "test:smoke": "node scripts/smoke.mjs",
+    "test:smoke": "node tests/e2e/smoke.mjs",
     "verify": "node scripts/verify.mjs",
     "dlq": "node apps/backend/dist/commands/dlq.js",
     "format": "prettier --write ."

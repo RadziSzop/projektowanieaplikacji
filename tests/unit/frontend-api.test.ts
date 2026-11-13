@@ -1,6 +1,6 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { api } from '../apps/frontend/src/api.js';
+import { api } from '../../apps/frontend/src/api.js';
 
 test('web verification posts the key in the body, forwards cancellation and returns each status', async (t) => {
   const signal = AbortSignal.timeout(6000);
