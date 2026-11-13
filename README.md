@@ -55,6 +55,16 @@ docker compose stop frontend backend license-service notification-worker
 
 Vite działa na http://localhost:5173 i przekazuje `/api` do lokalnego backendu. Skrypt `with-local-env.mjs` wczytuje `.env` i ustawia adresy zależności na `127.0.0.1`; Compose używa nazw usług. `npm run dev` uruchamia frontend, API, generator i worker. Po zmianach wspólnych pakietów wykonaj ponownie `npm run build` i zrestartuj procesy developerskie.
 
+## Struktura
+
+- `packages/contracts`: schematy wejścia i kontrakty wiadomości (Zod)
+- `packages/license-core`: reguły domeny licencji (format, hash, szyfrowanie, stan)
+- `packages/database`, `packages/messaging`: infrastruktura (Prisma; RabbitMQ, outbox, retry, DLQ)
+- `apps/backend/src/api`: tylko HTTP (walidacja, autoryzacja, odpowiedź)
+- `apps/backend/src/services`: logika przypadków użycia, bez zależności od Hono
+- `apps/backend/src/commands`: narzędzia operatora (`npm run dlq`)
+- `apps/license-service`, `apps/notification-worker`: workery kolejek
+
 ## API
 
 Frontend pozostaje bez zmian; zachowano jego DTO i błędy `{ "error": "..." }`.
@@ -126,6 +136,8 @@ npm test
 npm run test:integration
 npm run test:smoke
 ```
+
+Podział: `tests/unit` (czysta logika, bez infrastruktury), `tests/integration` (API + PostgreSQL + RabbitMQ), `tests/e2e` (pełny przepływ na Compose).
 
 Testy integracyjne wymagają działającej infrastruktury i `.env`. Automatycznie tworzą oddzielną bazę `licensing_test` i vhost RabbitMQ `licensing_test`; nie usuwają danych aplikacji i mogą działać obok kontenerowych aplikacji. Zaawansowane ustawienia: `TEST_DATABASE_URL` (nazwa musi kończyć się `_test`), `TEST_RABBITMQ_URL` (vhost musi kończyć się `_test`) i `TEST_RABBITMQ_MANAGEMENT_URL`.
 
