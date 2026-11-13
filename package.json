@@ -22,7 +22,7 @@
     "env:init": "node scripts/init-env.mjs",
     "test:smoke": "node scripts/smoke.mjs",
     "verify": "node scripts/verify.mjs",
-    "dlq": "node apps/backend/dist/dlq.js",
+    "dlq": "node apps/backend/dist/commands/dlq.js",
     "format": "prettier --write ."
   },
   "devDependencies": {

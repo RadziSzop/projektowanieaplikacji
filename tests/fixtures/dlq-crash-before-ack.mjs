@@ -5,4 +5,4 @@ const { ConfirmChannel } = require('amqplib/lib/channel_model.js');
 ConfirmChannel.prototype.ack = function () {
   process.exit(91);
 };
-await import('../../apps/backend/src/dlq.ts');
+await import('../../apps/backend/src/commands/dlq.ts');

@@ -90,7 +90,7 @@ test('failures persist delayed retries, deduplicate redelivery, and finish in th
             [
               '--import',
               'tsx',
-              fixture ? 'tests/fixtures/dlq-crash-before-ack.mjs' : 'apps/backend/src/dlq.ts',
+              fixture ? 'tests/fixtures/dlq-crash-before-ack.mjs' : 'apps/backend/src/commands/dlq.ts',
               'retry',
               '--queue',
               queues.generation,

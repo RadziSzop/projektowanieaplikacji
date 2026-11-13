@@ -5,7 +5,7 @@ import { randomUUID } from 'node:crypto';
 import { createDatabase, tokenHash, type Database } from '@app/database';
 
 test('existing shop authentication, sessions, validation and ownership work against PostgreSQL', async () => {
-  const api = await import('../../apps/backend/src/api.js').catch(() => null);
+  const api = await import('../../apps/backend/src/api/index.js').catch(() => null);
   assert.ok(api, 'Shop API must exist');
   const db = createDatabase();
   const app = api.createApi({
@@ -125,7 +125,7 @@ test('existing shop authentication, sessions, validation and ownership work agai
 });
 
 test('a committed order still returns 201 when the optional result read fails or exceeds the deadline', async (t) => {
-  const { createApi } = await import('../../apps/backend/src/api.js');
+  const { createApi } = await import('../../apps/backend/src/api/index.js');
   const db = createDatabase();
   const options = {
     db,

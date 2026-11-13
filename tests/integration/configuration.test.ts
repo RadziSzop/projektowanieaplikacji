@@ -3,7 +3,7 @@ import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { randomUUID } from 'node:crypto';
 import { createDatabase } from '@app/database';
-import { createApi } from '../../apps/backend/src/api.js';
+import { createApi } from '../../apps/backend/src/api/index.js';
 import { generateLicense, verifyLicense } from '../../apps/license-service/src/service.js';
 import { newMessage } from '@app/messaging';
 import { decryptKey } from '@app/license-core';

@@ -1,7 +1,7 @@
 import { serve } from '@hono/node-server';
 import { createDatabase } from '@app/database';
 import { startOutboxPublisher } from '@app/messaging';
-import { createApi } from './api.js';
+import { createApi } from './api/index.js';
 
 const port = Number(process.env.PORT ?? 3000);
 if (!Number.isInteger(port) || port < 1 || port > 65535) throw new Error('Invalid PORT');
