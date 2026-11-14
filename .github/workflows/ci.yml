@@ -14,6 +14,7 @@ jobs:
       - run: npm ci
       - run: npm run env:init
       - run: npm run typecheck
+      - run: npm test -w @app/frontend
       - run: npm run build
       - run: npm test
       - run: docker compose config --quiet

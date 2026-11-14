@@ -1,8 +1,15 @@
 import { useState, type FormEvent } from 'react';
-import { api } from '../api';
-import { button, Field, panel } from '../components/ui';
+import { LicenseApi } from '../api/licenseApi';
+import { PageLayout } from '../components/layout/PageLayout';
+import { Alert } from '../components/ui/Alert';
+import { Button } from '../components/ui/Button';
+import { FormField } from '../components/ui/FormField';
+import { Panel } from '../components/ui/Panel';
+import type { LicenseStatus } from '../types';
 
-const results = {
+const TIMEOUT_MS = 6000;
+
+const results: Record<LicenseStatus, { title: string; description: string; color: string }> = {
   VALID: {
     title: 'Licencja jest ważna',
     description: 'Klucz jest poprawny, a licencja jest aktywna.',
@@ -27,7 +34,7 @@ const results = {
 
 export default function VerifyLicense() {
   const [key, setKey] = useState('');
-  const [status, setStatus] = useState<keyof typeof results | null>(null);
+  const [status, setStatus] = useState<LicenseStatus | null>(null);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState('');
 
@@ -38,14 +45,10 @@ export default function VerifyLicense() {
     setStatus(null);
     setError('');
     try {
-      const response = await api<{ status: string }>(
-        'licenses/verify',
-        { key: key.trim() },
-        AbortSignal.timeout(6000),
-      );
+      const response = await LicenseApi.verify(key.trim(), AbortSignal.timeout(TIMEOUT_MS));
       if (!response || !Object.hasOwn(results, response.status))
         throw new Error('Invalid response');
-      setStatus(response.status as keyof typeof results);
+      setStatus(response.status);
     } catch {
       setError('Nie udało się sprawdzić licencji. Spróbuj ponownie za chwilę.');
     } finally {
@@ -55,46 +58,43 @@ export default function VerifyLicense() {
 
   const result = status ? results[status] : null;
   return (
-    <div className="mx-auto max-w-xl">
-      <h1 className="mb-2 text-3xl font-semibold tracking-tight">Sprawdź licencję</h1>
-      <p className="mb-7 text-sm leading-6 text-zinc-400">
-        Wklej klucz z wiadomości e-mail, aby sprawdzić jego aktualny status. Nie musisz się logować.
-      </p>
-      <form onSubmit={submit} className={panel + ' space-y-5'} aria-busy={busy}>
-        <Field
-          label="Klucz licencyjny"
-          name="license-key"
-          value={key}
-          onChange={(event) => {
-            setKey(event.target.value);
-            setStatus(null);
-            setError('');
-          }}
-          placeholder="NOVA-…"
-          autoComplete="off"
-          autoCapitalize="none"
-          spellCheck={false}
-          maxLength={512}
-          required
-          disabled={busy}
-        />
-        <button className={button + ' w-full'} disabled={busy || !key.trim()}>
-          {busy ? 'Sprawdzanie…' : 'Sprawdź licencję'}
-        </button>
-        {error && (
-          <p role="alert" className="text-sm text-red-300">
-            {error}
-          </p>
-        )}
-      </form>
-      <div role="status" aria-live="polite" aria-atomic="true" className="mt-5">
+    <PageLayout
+      title="Sprawdź licencję"
+      description="Wklej klucz z wiadomości e-mail, aby sprawdzić jego aktualny status. Nie musisz się logować."
+      width="medium"
+    >
+      <Panel>
+        <form onSubmit={submit} className="space-y-5" aria-busy={busy}>
+          <FormField
+            label="Klucz licencyjny"
+            name="license-key"
+            value={key}
+            onChange={(event) => {
+              setKey(event.target.value);
+              setStatus(null);
+              setError('');
+            }}
+            placeholder="NOVA-…"
+            autoComplete="off"
+            autoCapitalize="none"
+            spellCheck={false}
+            maxLength={512}
+            disabled={busy}
+          />
+          <Button type="submit" full disabled={busy || !key.trim()}>
+            {busy ? 'Sprawdzanie…' : 'Sprawdź licencję'}
+          </Button>
+          <Alert>{error}</Alert>
+        </form>
+      </Panel>
+      <div role="status" aria-live="polite" aria-atomic="true">
         {result && (
-          <div className={'rounded-lg border p-5 ' + result.color}>
+          <div className={`rounded-lg border p-5 ${result.color}`}>
             <h2 className="font-semibold">{result.title}</h2>
             <p className="mt-1 text-sm leading-6">{result.description}</p>
           </div>
         )}
       </div>
-    </div>
+    </PageLayout>
   );
 }

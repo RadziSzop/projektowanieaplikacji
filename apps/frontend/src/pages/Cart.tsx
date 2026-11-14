@@ -1,61 +1,35 @@
-import { Link } from 'react-router-dom';
-import { money, type CartProduct, type User } from '../api';
-import { button, link, panel, Summary } from '../components/ui';
+import { CartRow } from '../components/cart/CartRow';
+import { EmptyCart } from '../components/cart/EmptyCart';
+import { OrderSummary } from '../components/cart/OrderSummary';
+import { PageLayout } from '../components/layout/PageLayout';
+import { ButtonLink } from '../components/ui/Button';
+import { useAuth } from '../hooks/useAuth';
+import { useCart } from '../hooks/useCart';
 
-type Props = {
-  items: CartProduct[];
-  user: User | null;
-  changeQuantity: (id: number, quantity: number) => void;
-  remove: (id: number) => void;
-};
-
-export default function Cart({ items, user, changeQuantity, remove }: Props) {
+export default function Cart() {
+  const { user } = useAuth();
+  const { items, changeQuantity, remove } = useCart();
   return (
-    <>
-      <h1 className="mb-8 text-3xl font-semibold tracking-tight">Koszyk</h1>
+    <PageLayout title="Koszyk">
       {!items.length ? (
-        <p>
-          Koszyk jest pusty.{' '}
-          <Link className={link} to="/">
-            Przejdź do sklepu
-          </Link>
-        </p>
+        <EmptyCart />
       ) : (
-        <div className="space-y-4">
+        <div className="space-y-6">
           {items.map((item) => (
-            <div className={panel + ' flex flex-wrap items-center gap-4'} key={item.id}>
-              <div className="flex-1">
-                <Link to={`/produkt/${item.id}`}>Nova {item.name}</Link>
-                <p className="text-sm text-zinc-400">{money(item.price)} / szt.</p>
-              </div>
-              <label className="flex items-center gap-2 text-sm">
-                Ilość
-                <select
-                  className="rounded-md border border-zinc-700 bg-zinc-900 p-2"
-                  value={item.quantity}
-                  onChange={(event) => changeQuantity(item.id, Number(event.target.value))}
-                >
-                  {Array.from({ length: 10 }, (_, i) => (
-                    <option key={i + 1}>{i + 1}</option>
-                  ))}
-                </select>
-              </label>
-              <span>{money(item.price * item.quantity)}</span>
-              <button
-                className="cursor-pointer text-sm text-red-300 underline"
-                onClick={() => remove(item.id)}
-              >
-                Usuń
-              </button>
-            </div>
+            <CartRow
+              key={item.id}
+              item={item}
+              onQuantityChange={(quantity) => changeQuantity(item.id, quantity)}
+              onRemove={() => remove(item.id)}
+            />
           ))}
-          <Summary items={items} />
+          <OrderSummary items={items} />
           {!user && <p className="text-sm text-zinc-400">Zaloguj się, aby złożyć zamówienie.</p>}
-          <Link className={button} to="/zamowienie">
+          <ButtonLink to="/zamowienie">
             {user ? 'Przejdź do zamówienia' : 'Zaloguj się i zamów'}
-          </Link>
+          </ButtonLink>
         </div>
       )}
-    </>
+    </PageLayout>
   );
 }

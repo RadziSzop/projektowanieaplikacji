@@ -1,9 +1,11 @@
 import { Link, NavLink } from 'react-router-dom';
-import type { User } from '../api';
+import { useAuth } from '../hooks/useAuth';
+import { useCart } from '../hooks/useCart';
+import { buttonClass } from './ui/Button';
 
-type Props = { count: number; user: User | null; onLogout: () => void };
-
-export default function Navbar({ count, user, onLogout }: Props) {
+export default function Navbar() {
+  const { user, logout } = useAuth();
+  const { count } = useCart();
   return (
     <header className="border-b border-zinc-800">
       <div className="mx-auto flex max-w-5xl flex-wrap items-center justify-between gap-4 px-6 py-5">
@@ -43,18 +45,26 @@ export default function Navbar({ count, user, onLogout }: Props) {
             </svg>
             <span className="text-xs">{count}</span>
           </NavLink>
+          {user && (
+            <NavLink
+              to="/licencje"
+              className={({ isActive }) =>
+                `rounded-md px-3 py-2 ${isActive ? 'bg-zinc-800 text-white' : 'text-zinc-400 hover:text-white'}`
+              }
+            >
+              Moje licencje
+            </NavLink>
+          )}
           {user ? (
             <button
+              type="button"
               className="cursor-pointer px-3 py-2 text-zinc-400 hover:text-white"
-              onClick={onLogout}
+              onClick={logout}
             >
               Wyloguj ({user.name})
             </button>
           ) : (
-            <Link
-              className="rounded-md border border-zinc-700 px-3 py-2 hover:bg-zinc-800"
-              to="/logowanie"
-            >
+            <Link className={buttonClass({ variant: 'secondary' })} to="/logowanie">
               Zaloguj się
             </Link>
           )}
