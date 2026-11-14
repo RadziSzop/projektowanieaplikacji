@@ -1,53 +1,34 @@
-# Projektowanie aplikacji
+# Sklep z kluczami
 
-Monorepo z frontendem Vite + React + TypeScript oraz backendem Express + TypeScript.
-Pakiety są zarządzane przez npm workspaces i wspólny `package-lock.json`.
+Frontend: React, TypeScript i Tailwind. Backend: pusty Express, bez endpointów i obsługi bazy.
 
-## Wymagania
+## Uruchomienie
 
-- Node.js 24.12+ (wersja 24 LTS) i npm.
-- Docker z Docker Compose do uruchomienia kontenerów.
+```sh
+docker compose up --build -d
+```
 
-## Praca lokalna
+Aplikacja: http://localhost:8080. Express działa na porcie 3000.
+Wywołania `/api/products`, `/api/me`, `/api/register`, `/api/login`, `/api/logout` i `/api/orders` zwracają 404. Frontend wyświetla błędy API i nie zawiera mocków.
+
+## Praca nad kodem
+
+Node.js 24.12+ i npm:
 
 ```sh
 npm ci
 npm run dev
 ```
 
-Frontend: http://localhost:5173. API: http://localhost:3000/api/health.
-Vite przekazuje żądania `/api` do backendu, więc nie trzeba konfigurować CORS.
-Backend odczytuje opcjonalną zmienną środowiskową `PORT` (domyślnie 3000).
-Plik `apps/backend/.env.example` pokazuje jej format; pliki `.env` nie są automatycznie wczytywane.
-Przy zmianie portu API należy też zmienić cel proxy w `apps/frontend/vite.config.ts`.
+Frontend: http://localhost:5173. Backend: http://localhost:3000.
 
 ```sh
-npm run typecheck
 npm run build
-npm run start -w @app/backend
+npm run format
 ```
 
-## Docker
+Widoki: `apps/frontend/src/pages`. Wspólne komponenty i navbar: `apps/frontend/src/components`.
+Nawigacja: `apps/frontend/src/App.tsx`. Stan i wywołania API: `apps/frontend/src/useShop.ts`.
+Style są w klasach Tailwinda. Express: `apps/backend/src/index.ts`.
 
-Z katalogu głównego repozytorium:
-
-```sh
-docker compose up --build -d
-docker compose down
-```
-
-Aplikacja jest dostępna pod http://localhost:8080.
-Nginx serwuje zbudowany frontend i przekazuje `/api` do backendu w sieci Compose.
-Backend działa jako użytkownik bez uprawnień root i nie publikuje portu na hoście.
-Obrazy są budowane wieloetapowo; obraz backendu zawiera tylko zależności produkcyjne.
-
-## Struktura
-
-```text
-apps/
-  frontend/  React, Vite, TypeScript, Nginx
-  backend/   Express, TypeScript
-compose.yaml
-```
-
-CI sprawdza typy, buduje aplikacje i obrazy oraz sprawdza połączenie z API przez Nginx.
+MySQL jest odłączony od aplikacji. Można uruchomić go osobno przez `docker compose --profile database up -d db`. Istniejące dane pozostają w wolumenie.

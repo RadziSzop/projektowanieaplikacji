@@ -13,9 +13,10 @@ jobs:
           cache: npm
       - run: npm ci
       - run: npm run typecheck
+      - run: npm test -w @app/frontend
       - run: npm run build
       - run: docker compose build
       - run: docker compose up -d --wait
-      - run: curl --fail --retry 5 --retry-delay 2 http://localhost:8080/api/health
+      - run: curl --fail --retry 5 --retry-delay 2 http://localhost:8080/
       - if: always()
         run: docker compose down
