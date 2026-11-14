@@ -1,11 +1,14 @@
-FROM node:24-alpine
+FROM node:24-alpine AS build
+RUN apk add --no-cache openssl
 WORKDIR /app
-COPY package.json package-lock.json ./
-COPY apps/backend/package.json apps/backend/package.json
-COPY apps/frontend/package.json apps/frontend/package.json
-RUN npm ci --workspace=@app/backend
-COPY apps/backend apps/backend
-RUN npm run build -w @app/backend
+COPY . .
+RUN npm ci && npm run build
+
+FROM node:24-alpine AS runtime
+ENV NODE_ENV=production
+WORKDIR /app
+COPY --from=build --chown=node:node /app /app
+RUN npm prune --omit=dev && npm cache clean --force
 USER node
 EXPOSE 3000
-CMD ["npm", "run", "start", "-w", "@app/backend"]
+CMD ["node", "apps/backend/dist/index.js"]

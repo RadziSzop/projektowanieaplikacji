@@ -6,3 +6,6 @@
 **/.env.*
 !**/.env.example
 **/*.log
+.local
+coverage
+packages/database/src/generated

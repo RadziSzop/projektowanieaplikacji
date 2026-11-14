@@ -1,0 +1,229 @@
+generator client {
+  provider = "prisma-client"
+  output = "../src/generated"
+}
+datasource db {
+  provider = "postgresql"
+  schemas = ["auth", "licensing", "messaging"]
+}
+enum Role {
+  USER
+  ADMIN
+  @@schema("auth")
+}
+enum JobStatus {
+  PENDING
+  PROCESSING
+  COMPLETED
+  FAILED
+  @@schema("licensing")
+}
+enum DeliveryKind {
+  EMAIL
+  METRICS
+  @@schema("licensing")
+}
+enum DeliveryStatus {
+  PENDING
+  PROCESSING
+  SENT
+  WRITTEN
+  FAILED
+  @@schema("licensing")
+}
+model User {
+  id String @id @default(uuid()) @db.Uuid
+  name String
+  email String @unique
+  passwordHash String
+  role Role @default(USER)
+  disabledAt DateTime? @db.Timestamptz
+  createdAt DateTime @default(now()) @db.Timestamptz
+  sessions Session[]
+  orders Order[]
+  requestedJobs GenerationJob[] @relation("Requester")
+  ownedJobs GenerationJob[] @relation("Owner")
+  licenses License[]
+  configs Config[]
+  @@schema("auth")
+}
+model Session {
+  id String @id @default(uuid()) @db.Uuid
+  userId String @db.Uuid
+  user User @relation(fields: [userId], references: [id])
+  tokenHash String @unique
+  expiresAt DateTime @db.Timestamptz
+  revokedAt DateTime? @db.Timestamptz
+  @@index([userId])
+  @@index([expiresAt])
+  @@schema("auth")
+}
+model Config {
+  id String @id @default(uuid()) @db.Uuid
+  name String
+  description String @default("")
+  enabled Boolean @default(true)
+  createdById String @db.Uuid
+  createdBy User @relation(fields: [createdById], references: [id])
+  createdAt DateTime @default(now()) @db.Timestamptz
+  versions ConfigVersion[]
+  @@index([createdById])
+  @@schema("licensing")
+}
+model ConfigVersion {
+  id String @id @default(uuid()) @db.Uuid
+  configId String @db.Uuid
+  config Config @relation(fields: [configId], references: [id])
+  version Int
+  prefix String
+  alphabet String
+  segmentCount Int
+  segmentLength Int
+  separator String
+  checksum Boolean @default(true)
+  validityDays Int?
+  createdAt DateTime @default(now()) @db.Timestamptz
+  products Product[]
+  items OrderItem[]
+  jobs GenerationJob[]
+  licenses License[]
+  @@unique([configId, version])
+  @@schema("licensing")
+}
+model Product {
+  id Int @id @default(autoincrement())
+  name String @unique
+  description String
+  price Int
+  features String[]
+  active Boolean @default(true)
+  configVersionId String @db.Uuid
+  configVersion ConfigVersion @relation(fields: [configVersionId], references: [id])
+  items OrderItem[]
+  @@index([configVersionId])
+  @@schema("licensing")
+}
+model Order {
+  id Int @id @default(autoincrement())
+  userId String @db.Uuid
+  user User @relation(fields: [userId], references: [id])
+  name String
+  email String
+  address String
+  postcode String
+  city String
+  total Int
+  createdAt DateTime @default(now()) @db.Timestamptz
+  items OrderItem[]
+  @@index([userId, createdAt])
+  @@schema("licensing")
+}
+model OrderItem {
+  id String @id @default(uuid()) @db.Uuid
+  orderId Int
+  order Order @relation(fields: [orderId], references: [id])
+  productId Int
+  product Product @relation(fields: [productId], references: [id])
+  configVersionId String @db.Uuid
+  configVersion ConfigVersion @relation(fields: [configVersionId], references: [id])
+  name String
+  price Int
+  quantity Int
+  jobs GenerationJob[]
+  @@unique([orderId, productId])
+  @@index([productId])
+  @@index([configVersionId])
+  @@schema("licensing")
+}
+model GenerationJob {
+  id String @id @default(uuid()) @db.Uuid
+  requestedById String @db.Uuid
+  requestedBy User @relation("Requester", fields: [requestedById], references: [id])
+  ownerId String @db.Uuid
+  owner User @relation("Owner", fields: [ownerId], references: [id])
+  recipientEmail String
+  configVersionId String @db.Uuid
+  configVersion ConfigVersion @relation(fields: [configVersionId], references: [id])
+  orderItemId String? @db.Uuid
+  orderItem OrderItem? @relation(fields: [orderItemId], references: [id])
+  unitIndex Int @default(0)
+  status JobStatus @default(PENDING)
+  attempts Int @default(0)
+  errorCode String?
+  createdAt DateTime @default(now()) @db.Timestamptz
+  finishedAt DateTime? @db.Timestamptz
+  license License?
+  @@unique([orderItemId, unitIndex])
+  @@index([ownerId, createdAt])
+  @@index([requestedById])
+  @@index([configVersionId])
+  @@schema("licensing")
+}
+model License {
+  id String @id @default(uuid()) @db.Uuid
+  generationJobId String @unique @db.Uuid
+  job GenerationJob @relation(fields: [generationJobId], references: [id])
+  ownerId String @db.Uuid
+  owner User @relation(fields: [ownerId], references: [id])
+  configVersionId String @db.Uuid
+  configVersion ConfigVersion @relation(fields: [configVersionId], references: [id])
+  keyHash String @unique
+  keyCiphertext Bytes
+  encryptionKeyVersion Int @default(1)
+  expiresAt DateTime? @db.Timestamptz
+  revokedAt DateTime? @db.Timestamptz
+  createdAt DateTime @default(now()) @db.Timestamptz
+  deliveries Delivery[]
+  @@index([ownerId, createdAt])
+  @@index([configVersionId])
+  @@schema("licensing")
+}
+model Delivery {
+  id String @id @default(uuid()) @db.Uuid
+  licenseId String @db.Uuid
+  license License @relation(fields: [licenseId], references: [id])
+  kind DeliveryKind
+  status DeliveryStatus @default(PENDING)
+  attempts Int @default(0)
+  errorCode String?
+  leaseToken String? @db.Uuid
+  leaseUntil DateTime? @db.Timestamptz
+  finishedAt DateTime? @db.Timestamptz
+  @@unique([licenseId, kind])
+  @@index([status, leaseUntil])
+  @@schema("licensing")
+}
+model Outbox {
+  id String @id @default(uuid()) @db.Uuid
+  eventId String @db.Uuid
+  queue String
+  payload Json
+  availableAt DateTime @default(now()) @db.Timestamptz
+  createdAt DateTime @default(now()) @db.Timestamptz
+  sentAt DateTime? @db.Timestamptz
+  leaseUntil DateTime? @db.Timestamptz
+  leaseToken String? @db.Uuid
+  @@index([sentAt, availableAt, leaseUntil])
+  @@schema("messaging")
+}
+model ProcessedMessage {
+  consumer String
+  messageId String @db.Uuid
+  processedAt DateTime @default(now()) @db.Timestamptz
+  @@id([consumer, messageId])
+  @@schema("messaging")
+}
+model DeadLetter {
+  id String @id @default(uuid()) @db.Uuid
+  consumer String
+  messageId String @db.Uuid
+  queue String
+  payload Json
+  errorCode String
+  attempts Int
+  createdAt DateTime @default(now()) @db.Timestamptz
+  redrivenAt DateTime? @db.Timestamptz
+  @@unique([consumer, messageId])
+  @@index([queue, redrivenAt, createdAt])
+  @@schema("messaging")
+}

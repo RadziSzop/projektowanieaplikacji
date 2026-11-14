@@ -49,3 +49,5 @@ export type License = {
   expiresAt: string | null;
   revokedAt: string | null;
 };
+
+export type LicenseStatus = 'VALID' | 'INVALID' | 'EXPIRED' | 'REVOKED';

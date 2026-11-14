@@ -1,0 +1,25 @@
+{
+  "name": "@app/database",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "exports": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "scripts": {
+    "generate": "prisma generate",
+    "migrate": "prisma migrate deploy",
+    "seed": "node dist/seed-cli.js",
+    "build": "tsc",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@app/contracts": "*",
+    "@prisma/client": "7.10.1",
+    "@prisma/adapter-pg": "7.10.1",
+    "pg": "^8.16.0"
+  },
+  "devDependencies": {
+    "prisma": "7.10.1",
+    "@types/pg": "^8.15.0"
+  }
+}

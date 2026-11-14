@@ -8,15 +8,16 @@ export class ApiError extends Error {
   }
 }
 
-export function get<T>(path: string) {
-  return request<T>(path);
+export function get<T>(path: string, signal?: AbortSignal) {
+  return request<T>(path, signal ? { signal } : undefined);
 }
 
-export function post<T>(path: string, body: object = {}) {
+export function post<T>(path: string, body: object = {}, signal?: AbortSignal) {
   return request<T>(path, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify(body),
+    ...(signal ? { signal } : {}),
   });
 }
 

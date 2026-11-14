@@ -13,6 +13,7 @@ import Confirmation from './pages/Confirmation';
 import Licenses from './pages/Licenses';
 import Auth from './pages/Auth';
 import NotFound from './pages/NotFound';
+import VerifyLicense from './pages/VerifyLicense';
 
 export default function App() {
   const auth = useAuth();
@@ -29,6 +30,7 @@ export default function App() {
           ) : (
             <Routes>
               <Route path="/" element={<Shop />} />
+              <Route path="/weryfikacja" element={<VerifyLicense />} />
               <Route path="/produkt/:id" element={<ProductDetails />} />
               <Route path="/koszyk" element={<Cart />} />
               <Route
