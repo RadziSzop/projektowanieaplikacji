@@ -67,7 +67,7 @@ Vite działa na http://localhost:5173 i przekazuje `/api` do lokalnego backendu.
 
 ## API
 
-Frontend pozostaje bez zmian; zachowano jego DTO i błędy `{ "error": "..." }`.
+Frontend korzysta z warstwy `apps/frontend/src/api/` (`ProductApi`, `AuthApi`, `OrderApi`, `LicenseApi`); błędy mają postać `{ "error": "..." }`.
 
 | Endpoint                               | Dostęp i zachowanie                                                                                                                   |
 | -------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------- |
@@ -89,7 +89,7 @@ Frontend pozostaje bez zmian; zachowano jego DTO i błędy `{ "error": "..." }`.
 
 Żądania zmieniające stan wymagają JSON. Przeglądarkowy `Origin` musi pasować do `PUBLIC_ORIGIN`; poza trybem production dozwolony jest także lokalny Vite. Przy HTTPS ciasteczka otrzymują `Secure`. Logowanie, rejestracja i weryfikacja są ograniczane per adres połączenia; limity są lokalne dla pojedynczego procesu.
 
-Zamówienie, zadania i outbox są zapisywane atomowo. `POST /api/orders` czeka na wygenerowanie kluczy najwyżej 20 sekund, bez oczekiwania na mail/metryki. Potem zwraca `201` i obecny DTO zamówienia, z już dostępnymi kluczami; tablice mogą być puste. Brakujące klucze dotrą mailem, a status jest dostępny przez API. Ten wariant pozwala zachować frontend bez pollingu. Odświeżenie strony potwierdzenia zachowuje dotychczasowe zachowanie frontendu; zamówienie pozostaje w bazie i można je odczytać przez API.
+Zamówienie, zadania i outbox są zapisywane atomowo. `POST /api/orders` czeka na wygenerowanie kluczy najwyżej 20 sekund, bez oczekiwania na mail/metryki. Potem zwraca `201` i obecny DTO zamówienia, z już dostępnymi kluczami; tablice mogą być puste. Brakujące klucze dotrą mailem, a status jest dostępny przez API. Strona zamówienia we frontendzie (`/zamowienia/:id`) odczytuje `GET /api/orders/:id`, więc działa po odświeżeniu i co 3 sekundy aktualizuje status generowania kluczy oraz wysyłki maili. Zalogowany użytkownik widzi swoje klucze na stronie `/licencje`.
 
 Osobne żądania HTTP tworzą osobne zamówienia. Gwarancja pojedynczego wydania dotyczy zadania. Przy przerwanym połączeniu sprawdź utworzone zamówienie przed ponownym zleceniem.
 
